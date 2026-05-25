@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: ai-dev-assistant-dashboard
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/ai_dev_dashboard}
+    username: ${DATABASE_USERNAME:dashboard_user}
+    password: ${DATABASE_PASSWORD:dashboard_password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+app:
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    model: ${OPENAI_MODEL:gpt-4o-mini}
