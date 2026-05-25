@@ -1,5 +1,7 @@
 package com.example.aidevdashboard.config;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +15,13 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                Set<String> allowedOrigins = new LinkedHashSet<>();
+                allowedOrigins.add(frontendOrigin);
+                allowedOrigins.add("http://localhost:5173");
+                allowedOrigins.add("http://127.0.0.1:5173");
+
                 registry.addMapping("/api/**")
-                        .allowedOrigins(frontendOrigin)
+                        .allowedOrigins(allowedOrigins.toArray(String[]::new))
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*");
             }

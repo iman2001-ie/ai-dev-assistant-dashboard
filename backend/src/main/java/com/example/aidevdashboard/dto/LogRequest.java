@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record LogRequest(
         @NotBlank @Size(max = 180) String title,
-        @NotBlank String content,
+        @NotBlank @Size(max = 12000) String content,
         @Size(max = 120) String source,
         boolean resolved
 ) {

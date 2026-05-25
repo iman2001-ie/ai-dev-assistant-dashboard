@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public record TaskRequest(
         @NotBlank @Size(max = 160) String title,
-        String description,
+        @Size(max = 4000) String description,
         @NotNull TaskStatus status,
         @NotNull TaskPriority priority
 ) {

@@ -8,6 +8,8 @@ import type { DeveloperTask, TaskPayload } from '../types';
 export default function TasksPage() {
   const [tasks, setTasks] = useState<DeveloperTask[]>([]);
   const [editingTask, setEditingTask] = useState<DeveloperTask | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'ALL' | DeveloperTask['status']>('ALL');
+  const [priorityFilter, setPriorityFilter] = useState<'ALL' | DeveloperTask['priority']>('ALL');
   const [error, setError] = useState('');
 
   async function loadTasks() {
@@ -19,23 +21,46 @@ export default function TasksPage() {
   }, []);
 
   async function handleCreate(payload: TaskPayload) {
-    await createTask(payload);
-    await loadTasks();
+    setError('');
+    try {
+      await createTask(payload);
+      await loadTasks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not create task');
+      throw err;
+    }
   }
 
   async function handleUpdate(payload: TaskPayload) {
     if (!editingTask) {
       return;
     }
-    await updateTask(editingTask.id, payload);
-    setEditingTask(null);
-    await loadTasks();
+    setError('');
+    try {
+      await updateTask(editingTask.id, payload);
+      setEditingTask(null);
+      await loadTasks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update task');
+      throw err;
+    }
   }
 
   async function handleDelete(id: number) {
-    await deleteTask(id);
-    await loadTasks();
+    setError('');
+    try {
+      await deleteTask(id);
+      await loadTasks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not delete task');
+    }
   }
+
+  const visibleTasks = tasks.filter((task) => {
+    const matchesStatus = statusFilter === 'ALL' || task.status === statusFilter;
+    const matchesPriority = priorityFilter === 'ALL' || task.priority === priorityFilter;
+    return matchesStatus && matchesPriority;
+  });
 
   return (
     <div className="page stack">
@@ -56,7 +81,33 @@ export default function TasksPage() {
           />
         </Card>
         <Card title="Task list">
-          <TaskList tasks={tasks} onEdit={setEditingTask} onDelete={handleDelete} />
+          <div className="toolbar">
+            <label>
+              Status
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}
+              >
+                <option value="ALL">All</option>
+                <option value="TODO">Todo</option>
+                <option value="IN_PROGRESS">In progress</option>
+                <option value="DONE">Done</option>
+              </select>
+            </label>
+            <label>
+              Priority
+              <select
+                value={priorityFilter}
+                onChange={(event) => setPriorityFilter(event.target.value as typeof priorityFilter)}
+              >
+                <option value="ALL">All</option>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+            </label>
+          </div>
+          <TaskList tasks={visibleTasks} onEdit={setEditingTask} onDelete={handleDelete} />
         </Card>
       </div>
     </div>

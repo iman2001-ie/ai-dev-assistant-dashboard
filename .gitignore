@@ -6,8 +6,12 @@ Thumbs.db
 
 # Environment files
 .env
+.env.*
 .env.local
 *.local
+!.env.example
+!frontend/.env.example
+!backend/.env.example
 
 # Frontend
 frontend/node_modules/
@@ -22,3 +26,6 @@ backend/.mvn/wrapper/maven-wrapper.jar
 
 # Logs
 *.log
+
+# Local runtime files
+.runtime/

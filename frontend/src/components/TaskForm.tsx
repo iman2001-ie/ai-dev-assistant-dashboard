@@ -30,10 +30,13 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setSaving(true);
-    await onSubmit(form);
-    setSaving(false);
-    if (!initialTask) {
-      setForm(emptyTask);
+    try {
+      await onSubmit(form);
+      if (!initialTask) {
+        setForm(emptyTask);
+      }
+    } finally {
+      setSaving(false);
     }
   }
 

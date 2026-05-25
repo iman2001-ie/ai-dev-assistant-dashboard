@@ -1,155 +1,158 @@
 # AI Dev Assistant Dashboard
 
-A beginner-friendly full-stack developer productivity dashboard for managing coding tasks, saving error logs, and asking an AI assistant for help. The project is intentionally small, but it uses a structure that can grow into a larger app.
+A full-stack developer productivity dashboard for tracking coding tasks, saving error logs, and asking an AI assistant for debugging help.
+
+This project is intentionally small enough to learn from, but structured like a real application: a React frontend, a Spring Boot REST API, PostgreSQL persistence, database migrations, and an optional OpenAI-powered assistant.
+
+## Features
+
+- Dashboard summary for tasks, unresolved logs, and assistant activity
+- Task management with status and priority filters
+- Error log storage with source and resolved/open filters
+- AI assistant chat with separate histories for general chat and each saved error log
+- Markdown rendering for assistant responses
+- Mock assistant responses when no OpenAI API key is configured
+- PostgreSQL schema management with Flyway migrations
 
 ## Tech Stack
 
 - Frontend: React, TypeScript, Vite, React Router
-- Backend: Java, Spring Boot, Spring Data JPA, Flyway
+- Backend: Java 21, Spring Boot, Spring Web, Spring Data JPA
 - Database: PostgreSQL
-- API style: REST
-- AI: OpenAI API when `OPENAI_API_KEY` is provided, mock responses otherwise
-- Styling: plain CSS
+- Migrations: Flyway
+- AI: OpenAI API, optional
+- Styling: CSS
 
 ## Project Structure
 
 ```text
 ai-dev-assistant-dashboard/
-  frontend/        React + TypeScript app
-  backend/         Spring Boot REST API
-  docker-compose.yml
+  backend/                 Spring Boot REST API
+  frontend/                React + TypeScript app
+  docs/                    Additional development notes
+  scripts/                 Local helper scripts
+  docker-compose.yml       Recommended local PostgreSQL service
   README.md
 ```
 
-## Run PostgreSQL
+## Getting Started
 
-Docker is optional. Use either Docker or your locally installed PostgreSQL.
+### Prerequisites
 
-### Option A: Local PostgreSQL and pgAdmin
+- Java 21
+- Maven 3.9+
+- Node.js 20+
+- npm
+- Docker Desktop
 
-If you installed PostgreSQL locally, create the database and user manually.
+### Quick Start
 
-In pgAdmin:
+From the project root:
 
-1. Open pgAdmin.
-2. Connect to your local PostgreSQL server.
-3. Right-click `Databases`.
-4. Select `Create` then `Database`.
-5. Name it `ai_dev_dashboard`.
-6. Open the Query Tool and run:
-
-```sql
-CREATE USER dashboard_user WITH PASSWORD 'dashboard_password';
-CREATE DATABASE ai_dev_dashboard OWNER dashboard_user;
-GRANT ALL PRIVILEGES ON DATABASE ai_dev_dashboard TO dashboard_user;
+```powershell
+.\scripts\start-dev.ps1
 ```
 
-If permission errors happen when the app starts, also run this while connected to the `ai_dev_dashboard` database:
+Then open:
 
-```sql
-GRANT ALL ON SCHEMA public TO dashboard_user;
-GRANT CREATE ON SCHEMA public TO dashboard_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO dashboard_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO dashboard_user;
+```text
+http://127.0.0.1:5173
 ```
 
-The same starter SQL is available at `backend/src/main/resources/db/setup-local-postgres.sql`.
+The script starts PostgreSQL with Docker Compose, starts the Spring Boot backend, and starts the Vite frontend.
 
-### Option B: Docker
+To stop the local stack:
+
+```powershell
+.\scripts\stop-dev.ps1
+```
+
+To check what is running:
+
+```powershell
+.\scripts\status-dev.ps1
+```
+
+### Manual Setup
+
+If you prefer to run each service yourself, use the commands below.
+
+### 1. Start PostgreSQL
+
+This project uses Docker Compose as the recommended local database setup. It keeps the app's PostgreSQL version, database name, username, and password consistent across machines.
 
 ```bash
 docker compose up -d
 ```
 
-If your Docker installation uses the standalone Compose command, run:
+This starts PostgreSQL on `localhost:5432` using the local development credentials from `docker-compose.yml`.
+
+### 2. Start the Backend
 
 ```bash
-docker-compose up -d
-```
-
-PostgreSQL should be available at `localhost:5432`.
-
-Default local credentials:
-
-- Database: `ai_dev_dashboard`
-- Username: `dashboard_user`
-- Password: `dashboard_password`
-
-## Run Backend
-
-From `backend/`:
-
-```bash
+cd backend
 mvn spring-boot:run
 ```
 
-The API runs at `http://localhost:8080`.
+The API runs at:
 
-Useful environment variables:
-
-```bash
-DATABASE_URL=jdbc:postgresql://localhost:5432/ai_dev_dashboard
-DATABASE_USERNAME=dashboard_user
-DATABASE_PASSWORD=dashboard_password
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4o-mini
-FRONTEND_ORIGIN=http://localhost:5173
+```text
+http://localhost:8080
 ```
 
-If `OPENAI_API_KEY` is blank or missing, the backend returns a helpful mock AI response.
-
-## Run Frontend
-
-From `frontend/`:
+### 3. Start the Frontend
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-If npm cannot write to your global cache directory, keep the cache inside this project:
+The app runs at:
 
-```bash
-npm install --cache .npm-cache
+```text
+http://localhost:5173
 ```
 
-The frontend runs at `http://localhost:5173`.
+## Optional AI Setup
 
-Optional frontend environment variable:
+The app works without an OpenAI API key. If `OPENAI_API_KEY` is not set, the backend returns mock assistant responses for local development.
+
+To enable real AI responses, set:
 
 ```bash
-VITE_API_BASE_URL=http://localhost:8080/api
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-4o-mini
 ```
 
-## API Endpoints
+For local development, copy `.env.example` to `.env.local` and put private values there. `.env.local` is ignored by Git.
 
-### Tasks
+## API Overview
 
-- `GET /api/tasks`
-- `GET /api/tasks/{id}`
-- `POST /api/tasks`
-- `PUT /api/tasks/{id}`
-- `DELETE /api/tasks/{id}`
+Base URL:
 
-### Logs
+```text
+http://localhost:8080/api
+```
 
-- `GET /api/logs`
-- `GET /api/logs/{id}`
-- `POST /api/logs`
-- `PUT /api/logs/{id}`
-- `DELETE /api/logs/{id}`
-- `GET /api/logs/unresolved`
+Main endpoints:
 
-### AI Assistant
+- `GET /dashboard/summary`
+- `GET /tasks`
+- `POST /tasks`
+- `PUT /tasks/{id}`
+- `DELETE /tasks/{id}`
+- `GET /logs`
+- `POST /logs`
+- `PUT /logs/{id}`
+- `DELETE /logs/{id}`
+- `POST /chat`
+- `GET /chat/history?noContext=true`
+- `GET /chat/history?errorLogId={id}`
+- `DELETE /chat/history?noContext=true`
+- `DELETE /chat/history?errorLogId={id}`
 
-- `POST /api/chat`
-- `GET /api/chat/history`
-
-### Dashboard
-
-- `GET /api/dashboard/summary`
-
-## Example Chat Request
+Example chat request:
 
 ```json
 {
@@ -158,12 +161,24 @@ VITE_API_BASE_URL=http://localhost:8080/api
 }
 ```
 
-## Future Improvements
+## Development Notes
 
-- Add authentication and per-user data
-- Add task due dates and tags
-- Add conversation grouping
-- Add streaming AI responses
-- Add tests for services and controllers
-- Add production Dockerfiles for backend and frontend
-- Add richer agent tools and explicit tool-call traces
+More detailed setup notes and agent-specific instructions live outside the public README:
+
+- [Local development notes](docs/LOCAL_DEVELOPMENT.md)
+- [Secrets and API keys](docs/SECRETS.md)
+- [Agent instructions](AGENTS.md)
+
+## Roadmap
+
+- Authentication and per-user data
+- Task due dates and tags
+- Conversation grouping for assistant chats
+- Streaming AI responses
+- More backend service and controller tests
+- Production Dockerfiles for frontend and backend
+- Richer assistant tool traces
+
+## License
+
+No license has been selected yet.

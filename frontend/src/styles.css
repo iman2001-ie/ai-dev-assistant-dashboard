@@ -199,6 +199,21 @@ pre {
   gap: 0.5rem;
 }
 
+.toolbar {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
+}
+
+.toolbar label {
+  color: #334155;
+  display: grid;
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 0.35rem;
+}
+
 .list {
   display: grid;
   gap: 0.75rem;
@@ -271,6 +286,44 @@ pre {
   gap: 1rem;
 }
 
+.context-panel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.context-panel label {
+  color: #334155;
+  display: grid;
+  font-weight: 700;
+  gap: 0.35rem;
+}
+
+.context-panel p {
+  color: #64748b;
+  margin: 0;
+}
+
+.chat-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.context-pill {
+  background: #e0f2fe;
+  border-radius: 999px;
+  color: #075985;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-right: auto;
+  padding: 0.3rem 0.65rem;
+}
+
 .chat-history {
   display: grid;
   gap: 0.75rem;
@@ -287,6 +340,56 @@ pre {
 .chat-message p {
   margin: 0.35rem 0 0;
   white-space: pre-wrap;
+}
+
+.markdown-message {
+  margin-top: 0.35rem;
+}
+
+.markdown-message > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-message > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-message h1,
+.markdown-message h2,
+.markdown-message h3 {
+  color: #111827;
+  font-size: 1rem;
+  line-height: 1.35;
+  margin: 0.9rem 0 0.4rem;
+}
+
+.markdown-message p,
+.markdown-message ul,
+.markdown-message ol {
+  margin: 0.45rem 0;
+}
+
+.markdown-message ul,
+.markdown-message ol {
+  padding-left: 1.25rem;
+}
+
+.markdown-message li {
+  margin: 0.25rem 0;
+}
+
+.markdown-message code {
+  background: #e2e8f0;
+  border-radius: 4px;
+  color: #0f172a;
+  font-size: 0.9em;
+  padding: 0.1rem 0.25rem;
+}
+
+.markdown-message pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
 }
 
 .chat-message.user {
@@ -340,6 +443,7 @@ pre {
   }
 
   .form-row,
+  .toolbar,
   .sidebar nav {
     grid-template-columns: 1fr;
   }

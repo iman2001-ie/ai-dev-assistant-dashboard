@@ -8,6 +8,8 @@ import type { ErrorLog, LogPayload } from '../types';
 export default function LogsPage() {
   const [logs, setLogs] = useState<ErrorLog[]>([]);
   const [editingLog, setEditingLog] = useState<ErrorLog | null>(null);
+  const [resolvedFilter, setResolvedFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
+  const [sourceFilter, setSourceFilter] = useState('');
   const [error, setError] = useState('');
 
   async function loadLogs() {
@@ -19,23 +21,50 @@ export default function LogsPage() {
   }, []);
 
   async function handleCreate(payload: LogPayload) {
-    await createLog(payload);
-    await loadLogs();
+    setError('');
+    try {
+      await createLog(payload);
+      await loadLogs();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save log');
+      throw err;
+    }
   }
 
   async function handleUpdate(payload: LogPayload) {
     if (!editingLog) {
       return;
     }
-    await updateLog(editingLog.id, payload);
-    setEditingLog(null);
-    await loadLogs();
+    setError('');
+    try {
+      await updateLog(editingLog.id, payload);
+      setEditingLog(null);
+      await loadLogs();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update log');
+      throw err;
+    }
   }
 
   async function handleDelete(id: number) {
-    await deleteLog(id);
-    await loadLogs();
+    setError('');
+    try {
+      await deleteLog(id);
+      await loadLogs();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not delete log');
+    }
   }
+
+  const sources = Array.from(new Set(logs.map((log) => log.source).filter((source): source is string => Boolean(source)))).sort();
+  const visibleLogs = logs.filter((log) => {
+    const matchesResolved =
+      resolvedFilter === 'ALL' ||
+      (resolvedFilter === 'OPEN' && !log.resolved) ||
+      (resolvedFilter === 'RESOLVED' && log.resolved);
+    const matchesSource = !sourceFilter || log.source === sourceFilter;
+    return matchesResolved && matchesSource;
+  });
 
   return (
     <div className="page stack">
@@ -56,7 +85,31 @@ export default function LogsPage() {
           />
         </Card>
         <Card title="Saved logs">
-          <LogList logs={logs} onEdit={setEditingLog} onDelete={handleDelete} />
+          <div className="toolbar">
+            <label>
+              Status
+              <select
+                value={resolvedFilter}
+                onChange={(event) => setResolvedFilter(event.target.value as typeof resolvedFilter)}
+              >
+                <option value="ALL">All</option>
+                <option value="OPEN">Open</option>
+                <option value="RESOLVED">Resolved</option>
+              </select>
+            </label>
+            <label>
+              Source
+              <select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}>
+                <option value="">All</option>
+                {sources.map((source) => (
+                  <option key={source} value={source}>
+                    {source}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <LogList logs={visibleLogs} onEdit={setEditingLog} onDelete={handleDelete} />
         </Card>
       </div>
     </div>

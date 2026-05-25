@@ -30,10 +30,13 @@ export default function LogForm({ initialLog, onSubmit, onCancel }: LogFormProps
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setSaving(true);
-    await onSubmit(form);
-    setSaving(false);
-    if (!initialLog) {
-      setForm(emptyLog);
+    try {
+      await onSubmit(form);
+      if (!initialLog) {
+        setForm(emptyLog);
+      }
+    } finally {
+      setSaving(false);
     }
   }
 

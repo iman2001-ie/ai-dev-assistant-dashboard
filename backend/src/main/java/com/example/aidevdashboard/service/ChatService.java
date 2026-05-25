@@ -52,11 +52,33 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatMessageResponse> history() {
-        return chatMessageRepository.findTop20ByOrderByCreatedAtDesc()
+    public List<ChatMessageResponse> history(Long errorLogId, boolean noContext) {
+        List<ChatMessage> messages;
+        if (errorLogId != null) {
+            errorLogService.getEntity(errorLogId);
+            messages = chatMessageRepository.findTop20ByErrorLogIdOrderByCreatedAtDesc(errorLogId);
+        } else if (noContext) {
+            messages = chatMessageRepository.findTop20ByErrorLogIsNullOrderByCreatedAtDesc();
+        } else {
+            messages = chatMessageRepository.findTop20ByOrderByCreatedAtDesc();
+        }
+
+        return messages
                 .stream()
                 .sorted(Comparator.comparing(ChatMessage::getCreatedAt))
                 .map(ChatMessageResponse::fromEntity)
                 .toList();
+    }
+
+    @Transactional
+    public void clearHistory(Long errorLogId, boolean noContext) {
+        if (errorLogId != null) {
+            errorLogService.getEntity(errorLogId);
+            chatMessageRepository.deleteByErrorLogId(errorLogId);
+        } else if (noContext) {
+            chatMessageRepository.deleteByErrorLogIsNull();
+        } else {
+            chatMessageRepository.deleteAll();
+        }
     }
 }
