@@ -12,8 +12,12 @@ $backendLog = Join-Path $runtimeDir "backend.log"
 $backendErr = Join-Path $runtimeDir "backend.err.log"
 $frontendLog = Join-Path $runtimeDir "frontend.log"
 $frontendErr = Join-Path $runtimeDir "frontend.err.log"
+$stdinFile = Join-Path $runtimeDir "stdin.txt"
 
 New-Item -ItemType Directory -Force $runtimeDir | Out-Null
+if (-not (Test-Path $stdinFile)) {
+    New-Item -ItemType File -Path $stdinFile | Out-Null
+}
 
 function Stop-ListeningProcess {
     param([int] $Port)
@@ -44,6 +48,7 @@ $backendProcess = Start-Process -FilePath powershell.exe `
     -WindowStyle Hidden `
     -RedirectStandardOutput $backendLog `
     -RedirectStandardError $backendErr `
+    -RedirectStandardInput $stdinFile `
     -PassThru
 
 $frontendProcess = Start-Process -FilePath npm.cmd `
@@ -52,6 +57,7 @@ $frontendProcess = Start-Process -FilePath npm.cmd `
     -WindowStyle Hidden `
     -RedirectStandardOutput $frontendLog `
     -RedirectStandardError $frontendErr `
+    -RedirectStandardInput $stdinFile `
     -PassThru
 
 Set-Content -Path (Join-Path $runtimeDir "backend.pid") -Value $backendProcess.Id
