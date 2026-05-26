@@ -16,7 +16,7 @@ This project is intentionally small enough to learn from, but structured like a 
 
 ## Demo
 
-The app currently runs locally. The walkthrough and screenshots below use sample development data.
+The app currently runs locally. The walkthrough below uses sample development data to show task creation, task editing, error log tracking, and an AI-assisted debugging chat.
 
 ![AI Dev Assistant Dashboard walkthrough](docs/demo/walkthrough.gif)
 
