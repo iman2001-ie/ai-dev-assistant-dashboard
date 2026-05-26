@@ -14,6 +14,22 @@ This project is intentionally small enough to learn from, but structured like a 
 - Mock assistant responses when no OpenAI API key is configured
 - PostgreSQL schema management with Flyway migrations
 
+## Demo
+
+The app currently runs locally. The walkthrough and screenshots below use sample development data.
+
+![AI Dev Assistant Dashboard walkthrough](docs/demo/walkthrough.gif)
+
+## Screenshots
+
+| Dashboard | Tasks |
+| --- | --- |
+| ![Dashboard overview showing task, log, and assistant activity summary cards](docs/screenshots/dashboard.png) | ![Task management page with task creation and filtering](docs/screenshots/tasks.png) |
+
+| Error Logs | AI Assistant |
+| --- | --- |
+| ![Error log page for saving stack traces and tracking resolved logs](docs/screenshots/error-logs.png) | ![AI assistant chat page with mock debugging response](docs/screenshots/ai-assistant.png) |
+
 ## Tech Stack
 
 - Frontend: React, TypeScript, Vite, React Router
