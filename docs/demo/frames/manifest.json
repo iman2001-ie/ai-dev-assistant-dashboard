@@ -1,0 +1,42 @@
+[
+  {
+    "file": "01-dashboard.png",
+    "delay": 2600
+  },
+  {
+    "file": "02-task-form-filled.png",
+    "delay": 2800
+  },
+  {
+    "file": "03-task-created.png",
+    "delay": 2800
+  },
+  {
+    "file": "04-task-editing.png",
+    "delay": 2800
+  },
+  {
+    "file": "05-task-updated.png",
+    "delay": 2600
+  },
+  {
+    "file": "06-log-form-filled.png",
+    "delay": 3000
+  },
+  {
+    "file": "07-log-saved.png",
+    "delay": 2800
+  },
+  {
+    "file": "08-assistant-question.png",
+    "delay": 3200
+  },
+  {
+    "file": "09-assistant-response.png",
+    "delay": 5200
+  },
+  {
+    "file": "10-dashboard-updated.png",
+    "delay": 3800
+  }
+]
