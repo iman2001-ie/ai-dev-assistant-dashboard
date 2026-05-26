@@ -26,7 +26,7 @@ public class OpenAiClient {
         this.restClient = restClientBuilder.baseUrl("https://api.openai.com").build();
         this.apiKey = normalizeSecret(apiKey);
         this.model = model;
-        log.info("OpenAI API configured: {}{}", isConfigured(), keyDiagnosticSuffix());
+        log.info("OpenAI API configured: {}", isConfigured());
     }
 
     public boolean isConfigured() {
@@ -74,16 +74,6 @@ public class OpenAiClient {
             return null;
         }
         return secret.trim().replace("\uFEFF", "");
-    }
-
-    private String keyDiagnosticSuffix() {
-        if (!isConfigured()) {
-            return "";
-        }
-
-        String prefix = apiKey.length() <= 7 ? apiKey : apiKey.substring(0, 7);
-        String suffix = apiKey.length() <= 4 ? "" : apiKey.substring(apiKey.length() - 4);
-        return " (length: %d, starts: %s, ends: %s)".formatted(apiKey.length(), prefix, suffix);
     }
 
     private String mockResponse(String prompt) {
