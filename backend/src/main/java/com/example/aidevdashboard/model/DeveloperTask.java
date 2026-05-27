@@ -39,6 +39,9 @@ public class DeveloperTask {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @PrePersist
     void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -94,4 +97,13 @@ public class DeveloperTask {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
 }
