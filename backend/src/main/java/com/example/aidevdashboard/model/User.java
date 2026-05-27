@@ -23,6 +23,9 @@ public class User {
     @Column(name = "created_at")
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     // getters and setters
 
     public Long getId() { return id; }
@@ -39,4 +42,7 @@ public class User {
 
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getRefreshToken() { return refreshToken; }
+    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
 }

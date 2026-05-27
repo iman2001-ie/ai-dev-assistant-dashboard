@@ -18,13 +18,29 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest req) {
-        String token = authService.register(req);
-        return ResponseEntity.ok(new AuthResponse(token, req.getUsername()));
+        AuthResponse resp = authService.register(req);
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest req) {
-        String token = authService.login(req);
-        return ResponseEntity.ok(new AuthResponse(token, req.getUsername()));
+        AuthResponse resp = authService.login(req);
+        return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody java.util.Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        AuthResponse resp = authService.refresh(refreshToken);
+        return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(org.springframework.security.core.Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            authService.logout(username);
+        }
+        return ResponseEntity.ok().build();
     }
 }
