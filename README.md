@@ -1,5 +1,7 @@
 # AI Dev Assistant Dashboard
 
+[![CI](https://github.com/iman2001-ie/ai-dev-assistant-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/iman2001-ie/ai-dev-assistant-dashboard/actions/workflows/ci.yml)
+
 A full-stack developer productivity dashboard for tracking coding tasks, saving error logs, and asking an AI assistant for debugging help.
 
 This project is intentionally small enough to learn from, but structured like a real application: a React frontend, a Spring Boot REST API, PostgreSQL persistence, database migrations, and an optional OpenAI-powered assistant.
