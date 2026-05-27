@@ -73,12 +73,15 @@ public class TaskService {
 
     private DeveloperTask getEntity(Long id) {
         Long userId = resolveCurrentUserId();
-        if (userId != null) {
-            return taskRepository.findByIdAndUserId(id, userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Task not found with id " + id));
+        var maybe = taskRepository.findById(id);
+        if (maybe.isEmpty()) {
+            throw new ResourceNotFoundException("Task not found with id " + id);
         }
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id " + id));
+        DeveloperTask task = maybe.get();
+        if (userId != null && !userId.equals(task.getUserId())) {
+            throw new org.springframework.security.access.AccessDeniedException("Access denied to task " + id);
+        }
+        return task;
     }
 
     private void applyRequest(DeveloperTask task, TaskRequest request) {

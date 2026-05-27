@@ -85,6 +85,6 @@ public class AuthPerUserTaskIntegrationTest {
         // A should not access B's single task by id
         Long bId = ((Number) firstB.get("id")).longValue();
         ResponseEntity<String> aGetsB = restTemplate.exchange("/api/tasks/" + bId, HttpMethod.GET, new HttpEntity<>(headersA), String.class);
-        assertThat(aGetsB.getStatusCode().is4xxClientError()).isTrue();
+        assertThat(aGetsB.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 }
