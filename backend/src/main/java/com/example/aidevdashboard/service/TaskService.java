@@ -25,7 +25,10 @@ public class TaskService {
     public List<TaskResponse> findAll() {
         Long userId = resolveCurrentUserId();
         if (userId != null) {
-            return taskRepository.findAllByUserId(userId).stream().map(TaskResponse::fromEntity).toList();
+            return taskRepository.findAll().stream()
+                    .filter(task -> task.getUserId() == null || userId.equals(task.getUserId()))
+                    .map(TaskResponse::fromEntity)
+                    .toList();
         }
         return taskRepository.findAll().stream().map(TaskResponse::fromEntity).toList();
     }
@@ -34,7 +37,12 @@ public class TaskService {
     public List<TaskResponse> findRecent() {
         Long userId = resolveCurrentUserId();
         if (userId != null) {
-            return taskRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId).stream().map(TaskResponse::fromEntity).toList();
+            return taskRepository.findAll().stream()
+                    .filter(task -> task.getUserId() == null || userId.equals(task.getUserId()))
+                    .sorted((left, right) -> right.getCreatedAt().compareTo(left.getCreatedAt()))
+                    .limit(5)
+                    .map(TaskResponse::fromEntity)
+                    .toList();
         }
         return taskRepository.findTop5ByOrderByCreatedAtDesc().stream().map(TaskResponse::fromEntity).toList();
     }
@@ -78,7 +86,7 @@ public class TaskService {
             throw new ResourceNotFoundException("Task not found with id " + id);
         }
         DeveloperTask task = maybe.get();
-        if (userId != null && !userId.equals(task.getUserId())) {
+        if (userId != null && task.getUserId() != null && !userId.equals(task.getUserId())) {
             throw new org.springframework.security.access.AccessDeniedException("Access denied to task " + id);
         }
         return task;
