@@ -30,14 +30,14 @@ async function postJson(path: string, body: any) {
 }
 
 export async function register(username: string, email: string, password: string) {
-  const { res, json } = await postJson('/api/auth/register', { username, email, password });
+  const { res, json } = await postJson('/auth/register', { username, email, password });
   if (!res.ok) throw json || { message: 'Register failed' };
   setTokens(json.token, json.refreshToken);
   return json;
 }
 
 export async function login(username: string, password: string) {
-  const { res, json } = await postJson('/api/auth/login', { username, password });
+  const { res, json } = await postJson('/auth/login', { username, password });
   if (!res.ok) throw json || { message: 'Login failed' };
   setTokens(json.token, json.refreshToken);
   return json;
@@ -46,7 +46,7 @@ export async function login(username: string, password: string) {
 export async function refresh() {
   const refreshToken = getRefreshToken();
   if (!refreshToken) throw new Error('No refresh token');
-  const { res, json } = await postJson('/api/auth/refresh', { refreshToken });
+  const { res, json } = await postJson('/auth/refresh', { refreshToken });
   if (!res.ok) {
     clearTokens();
     throw json || { message: 'Refresh failed' };
