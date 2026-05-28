@@ -16,9 +16,11 @@ export function clearTokens() {
   localStorage.removeItem('refreshToken');
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function postJson(path: string, body: any) {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -56,7 +58,7 @@ export async function refresh() {
 export async function logout() {
   const token = getToken();
   try {
-    await fetch('/api/auth/logout', {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });

@@ -7,9 +7,6 @@ import com.example.aidevdashboard.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import com.example.aidevdashboard.service.ResourceNotFoundException;
-
 @Service
 public class AuthService {
 
@@ -24,8 +21,12 @@ public class AuthService {
     }
 
     public AuthResponse register(AuthRequest req) {
-        Optional<User> existing = userRepository.findByUsername(req.getUsername());
-        if (existing.isPresent()) throw new IllegalArgumentException("Username already exists");
+        if (userRepository.findByUsername(req.getUsername()).isPresent()) {
+            throw new AuthException("Username already exists");
+        }
+        if (userRepository.findByEmail(req.getEmail()).isPresent()) {
+            throw new AuthException("Email already exists");
+        }
         User u = new User();
         u.setUsername(req.getUsername());
         u.setEmail(req.getEmail());
@@ -39,8 +40,8 @@ public class AuthService {
     }
 
     public AuthResponse login(AuthRequest req) {
-        User u = userRepository.findByUsername(req.getUsername()).orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
-        if (!passwordEncoder.matches(req.getPassword(), u.getPasswordHash())) throw new IllegalArgumentException("Invalid credentials");
+        User u = userRepository.findByUsername(req.getUsername()).orElseThrow(() -> new AuthException("Invalid credentials"));
+        if (!passwordEncoder.matches(req.getPassword(), u.getPasswordHash())) throw new AuthException("Invalid credentials");
         // rotate/issue refresh token
         String refresh = java.util.UUID.randomUUID().toString();
         u.setRefreshToken(refresh);
@@ -50,6 +51,9 @@ public class AuthService {
     }
 
     public AuthResponse refresh(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new AuthException("Refresh token is required");
+        }
         User u = userRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new ResourceNotFoundException("Refresh token not found"));
         // rotate refresh token
         String newRefresh = java.util.UUID.randomUUID().toString();

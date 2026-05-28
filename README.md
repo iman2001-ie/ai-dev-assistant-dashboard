@@ -132,6 +132,23 @@ The app runs at:
 http://localhost:5173
 ```
 
+### 4. Log In Locally
+
+The app currently uses username/password login. After the backend is running, you can create a local development user:
+
+```powershell
+.\scripts\create-dev-user.ps1
+```
+
+Default local credentials:
+
+```text
+Username: testuser
+Password: Password123!
+```
+
+The app does not have roles or an admin/super-user model yet.
+
 ## Optional AI Setup
 
 The app works without an OpenAI API key. If `OPENAI_API_KEY` is not set, the backend returns mock assistant responses for local development.
@@ -155,6 +172,10 @@ http://localhost:8080/api
 
 Main endpoints:
 
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/refresh`
+- `POST /auth/logout`
 - `GET /dashboard/summary`
 - `GET /tasks`
 - `POST /tasks`

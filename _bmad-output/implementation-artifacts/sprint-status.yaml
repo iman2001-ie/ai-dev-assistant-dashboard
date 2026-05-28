@@ -1,0 +1,60 @@
+# generated: 2026-05-28
+# last_updated: 2026-05-28
+# project: ai-dev-assistant-dashboard
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+#
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - This file was generated from docs/sprint1-tasks.md after converting that
+#   table into _bmad-output/planning-artifacts/epics.md.
+# - Source status values of "in_progress" were mapped to BMAD "in-progress".
+
+generated: 2026-05-28
+last_updated: 2026-05-28
+project: ai-dev-assistant-dashboard
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  epic-1: in-progress
+  1-1-decide-authentication-approach: done
+  1-2-implement-auth-endpoints-and-jwt-handling: done
+  1-3-build-frontend-login-logout-and-protected-routes: backlog
+  1-4-add-flyway-migrations-for-users-and-ownership: backlog
+  1-5-add-auth-unit-and-integration-tests: backlog
+  epic-1-retrospective: optional
+  epic-2: backlog
+  2-1-add-agent-list-and-run-endpoints: backlog
+  2-2-add-agent-list-ui-and-run-controls: backlog
+  2-3-persist-agent-run-logs-and-retrieve-them: backlog
+  epic-2-retrospective: optional
+  epic-3: backlog
+  3-1-finalize-ci-checks-for-pull-requests: backlog
+  3-2-add-structured-logging-and-metrics-endpoint: backlog
+  3-3-add-smoke-e2e-tests-for-core-flows: backlog
+  epic-3-retrospective: optional

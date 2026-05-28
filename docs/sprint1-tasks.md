@@ -5,8 +5,8 @@ This file summarizes the Sprint 1 tickets, current status, owners, and estimates
 
 | ID | Title | Status | Owner | Estimate |
 | --- | --- | --- | --- | --- |
-| sprint1-auth-backend | Implement auth endpoints and JWT handling | in_progress | Backend | medium |
-| sprint1-auth-decision | Decide auth approach (JWT vs session) | in_progress | Architect | small |
+| sprint1-auth-backend | Implement auth endpoints and JWT handling | done | Backend | medium |
+| sprint1-auth-decision | Decide auth approach (JWT vs session) | done | Architect | small |
 | sprint1-auth-frontend | Frontend login/logout and protected routes | in_progress | Frontend | medium |
 | sprint1-auth-migrations | Add Flyway migrations for users and ownership | in_progress | Backend | small |
 | sprint1-auth-tests | Auth unit and integration tests | in_progress | QA | small |

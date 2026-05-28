@@ -115,6 +115,53 @@ The same starter SQL is available at:
 backend/src/main/resources/db/setup-local-postgres.sql
 ```
 
+## Local Auth Users
+
+The app currently supports normal registered users. It does not have roles or a real admin/super-user model yet.
+
+To create a local development user after the backend is running:
+
+```powershell
+.\scripts\create-dev-user.ps1
+```
+
+Default local credentials:
+
+```text
+Username: testuser
+Password: Password123!
+Email: testuser@example.com
+```
+
+Login uses the username, not the email address.
+
+To create a different local user:
+
+```powershell
+.\scripts\create-dev-user.ps1 -Username demo -Email demo@example.com -Password "Password123!"
+```
+
+## Reset Local Development Database
+
+Only use this for local Docker development data. It deletes the project Docker PostgreSQL volume and starts a fresh database container:
+
+```powershell
+.\scripts\reset-dev-db.ps1
+```
+
+Use the force flag only when you intentionally want a non-interactive reset:
+
+```powershell
+.\scripts\reset-dev-db.ps1 -Force
+```
+
+After resetting, start the backend so Flyway can recreate the schema, then create a local development user:
+
+```powershell
+.\scripts\start-backend.ps1
+.\scripts\create-dev-user.ps1
+```
+
 ## Useful Commands
 
 Use these if you prefer to run services manually instead of `start-dev.ps1`.
