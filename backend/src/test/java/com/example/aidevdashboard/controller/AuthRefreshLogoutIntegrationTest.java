@@ -44,6 +44,10 @@ public class AuthRefreshLogoutIntegrationTest {
         String newRefresh = (String) refreshedBody.get("refreshToken");
         assertThat(newRefresh).isNotEqualTo(refreshToken);
 
+        // The original refresh token was rotated and should no longer work.
+        ResponseEntity<Map> oldRefresh = restTemplate.postForEntity("/api/auth/refresh", Map.of("refreshToken", refreshToken), Map.class);
+        assertThat(oldRefresh.getStatusCode().is4xxClientError()).isTrue();
+
         // Logout using authenticated jwt
         HttpHeaders headers = new HttpHeaders(); headers.setBearerAuth((String) refreshedBody.get("token"));
         ResponseEntity<Void> logoutResp = restTemplate.postForEntity("/api/auth/logout", new HttpEntity<>(headers), Void.class);
@@ -53,5 +57,12 @@ public class AuthRefreshLogoutIntegrationTest {
         ResponseEntity<Map> failedRefresh = restTemplate.postForEntity("/api/auth/refresh", Map.of("refreshToken", newRefresh), Map.class);
         // after logout, refresh token should be invalidated -> 404
         assertThat(failedRefresh.getStatusCode().is4xxClientError()).isTrue();
+
+        ResponseEntity<Map> missingRefresh = restTemplate.postForEntity("/api/auth/refresh", Map.of(), Map.class);
+        assertThat(missingRefresh.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(missingRefresh.getBody()).isNotNull();
+        assertThat(missingRefresh.getBody().get("message")).isEqualTo("Refresh token is required");
+        assertThat(missingRefresh.getBody()).doesNotContainKey("token");
+        assertThat(missingRefresh.getBody()).doesNotContainKey("refreshToken");
     }
 }

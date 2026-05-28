@@ -1,6 +1,7 @@
 package com.example.aidevdashboard.config;
 
 import com.example.aidevdashboard.dto.ErrorResponse;
+import com.example.aidevdashboard.service.AuthException;
 import com.example.aidevdashboard.service.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -35,6 +36,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleUnreadableBody(HttpMessageNotReadableException ex) {
         return build(HttpStatus.BAD_REQUEST, "Request body is missing or malformed", Map.of());
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResponse> handleAuthException(AuthException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), Map.of());
     }
 
     @ExceptionHandler(RuntimeException.class)

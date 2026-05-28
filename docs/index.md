@@ -3,6 +3,7 @@
 ## Files
 
 - **[LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md)** - Local development setup and commands
+- **[auth-decision.md](./auth-decision.md)** - Authentication approach and API contract
 - **[project-overview.md](./project-overview.md)** - High-level project summary and quickstart
 - **[SECRETS.md](./SECRETS.md)** - Guidance on handling secrets and API keys
 
