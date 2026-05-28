@@ -167,4 +167,5 @@ public class AuthControllerIntegrationTest {
 
         assertThat(resp.getStatusCode().is4xxClientError()).isTrue();
     }
+
 }
