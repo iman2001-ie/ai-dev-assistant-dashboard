@@ -67,8 +67,10 @@ FRONTEND_ORIGIN=http://localhost:5173
 Frontend:
 
 ```bash
-VITE_API_BASE_URL=http://localhost:8080/api
+VITE_API_BASE_URL=/api
 ```
+
+The frontend dev server proxies `/api` to the backend by default, so you usually do not need to set `VITE_API_BASE_URL` locally. Use `http://localhost:8080/api` only if you intentionally want to bypass the proxy.
 
 Do not store real API keys in committed files. See [Secrets and API keys](SECRETS.md).
 
