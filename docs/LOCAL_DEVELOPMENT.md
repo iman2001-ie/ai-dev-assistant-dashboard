@@ -178,7 +178,7 @@ If `testuser` already exists from a previous run, create a fresh one with a diff
 
 ## Reset Local Development Database
 
-Only use this for local Docker development data. It deletes the project Docker PostgreSQL volume and starts a fresh database container:
+Only use this for local Docker development data. It stops the local app, deletes the project Docker PostgreSQL volume, and starts a fresh database container:
 
 ```powershell
 .\scripts\reset-dev-db.ps1
@@ -196,6 +196,11 @@ After resetting, start the backend so Flyway can recreate the schema, then creat
 .\scripts\start-backend.ps1
 .\scripts\create-dev-user.ps1
 ```
+
+If an old account still logs in after a reset, check two things:
+
+1. Make sure the backend was restarted after the reset. Old browser tokens may still show a username until the frontend makes a fresh API request.
+2. Check `.env.local` for a custom `DATABASE_URL`. The reset script only clears the Docker database from `docker-compose.yml`.
 
 ## Useful Commands
 

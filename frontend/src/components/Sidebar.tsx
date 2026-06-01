@@ -31,9 +31,11 @@ export default function Sidebar() {
         ))}
       </nav>
       <div style={styles.userSection}>
-        <div style={styles.userInfo}>
-          <p style={styles.userLabel}>Logged in as</p>
-          <p style={styles.userName}>{currentUser}</p>
+        <div className="sidebar-account">
+          <p className="sidebar-account-label">Logged in as</p>
+          <button className="sidebar-account-button" type="button" title="Account settings coming later">
+            {currentUser}
+          </button>
         </div>
         <button onClick={handleLogout} style={styles.logoutButton}>
           Logout
@@ -48,22 +50,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: 'auto',
     paddingTop: '1rem',
     borderTop: '1px solid #ddd',
-  },
-  userInfo: {
-    marginBottom: '1rem',
-    paddingBottom: '1rem',
-  },
-  userLabel: {
-    fontSize: '0.75rem',
-    color: '#999',
-    margin: '0 0 0.25rem 0',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  userName: {
-    margin: 0,
-    fontWeight: 600,
-    color: '#333',
   },
   logoutButton: {
     width: '100%',

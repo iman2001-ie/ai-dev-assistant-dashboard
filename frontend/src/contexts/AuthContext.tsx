@@ -26,13 +26,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const token = authService.getToken();
         const refreshToken = authService.getRefreshToken();
 
-        if (token) {
-          // Token exists, extract username from JWT (decode token payload)
-          const username = decodeTokenUsername(token);
-          setCurrentUser(username);
-          setIsAuthenticated(true);
-        } else if (refreshToken) {
-          // Try to refresh if refresh token exists
+        if (refreshToken) {
+          // Prove the saved session still exists on the backend before restoring it.
           try {
             const result = await authService.refresh();
             const username = decodeTokenUsername(result.token);
@@ -43,6 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setCurrentUser(null);
             setIsAuthenticated(false);
           }
+        } else if (token) {
+          authService.clearTokens();
+          setCurrentUser(null);
+          setIsAuthenticated(false);
         } else {
           setCurrentUser(null);
           setIsAuthenticated(false);

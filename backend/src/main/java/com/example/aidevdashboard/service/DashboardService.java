@@ -1,8 +1,6 @@
 package com.example.aidevdashboard.service;
 
 import com.example.aidevdashboard.dto.DashboardSummaryResponse;
-import com.example.aidevdashboard.model.ChatRole;
-import com.example.aidevdashboard.repository.ChatMessageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,16 +8,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class DashboardService {
     private final TaskService taskService;
     private final ErrorLogService errorLogService;
-    private final ChatMessageRepository chatMessageRepository;
+    private final ChatService chatService;
 
     public DashboardService(
             TaskService taskService,
             ErrorLogService errorLogService,
-            ChatMessageRepository chatMessageRepository
+            ChatService chatService
     ) {
         this.taskService = taskService;
         this.errorLogService = errorLogService;
-        this.chatMessageRepository = chatMessageRepository;
+        this.chatService = chatService;
     }
 
     @Transactional(readOnly = true)
@@ -27,7 +25,7 @@ public class DashboardService {
         return new DashboardSummaryResponse(
                 taskService.count(),
                 errorLogService.countUnresolved(),
-                chatMessageRepository.countByRole(ChatRole.ASSISTANT),
+                chatService.countAssistantMessages(),
                 taskService.findRecent(),
                 errorLogService.findRecent()
         );

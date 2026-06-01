@@ -8,13 +8,11 @@ import static org.mockito.Mockito.when;
 import com.example.aidevdashboard.dto.TaskRequest;
 import com.example.aidevdashboard.dto.TaskResponse;
 import com.example.aidevdashboard.model.DeveloperTask;
-import com.example.aidevdashboard.model.User;
 import com.example.aidevdashboard.model.TaskPriority;
 import com.example.aidevdashboard.model.TaskStatus;
 import com.example.aidevdashboard.repository.TaskRepository;
-import com.example.aidevdashboard.repository.UserRepository;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +29,7 @@ class TaskServiceTest {
     private TaskRepository taskRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private CurrentUserService currentUserService;
 
     @InjectMocks
     private TaskService taskService;
@@ -69,31 +67,15 @@ class TaskServiceTest {
     }
 
     @Test
-    void findAllIncludesSharedTasksForAuthenticatedUsers() {
-        User user = new User();
-        user.setId(7L);
-        user.setUsername("testuser");
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
-
-        DeveloperTask shared = new DeveloperTask();
-        shared.setTitle("Shared task");
-        shared.setStatus(TaskStatus.TODO);
-        shared.setPriority(TaskPriority.MEDIUM);
-        shared.setUserId(null);
-
+    void findAllReturnsOnlyOwnedTasksForAuthenticatedUsers() {
         DeveloperTask owned = new DeveloperTask();
         owned.setTitle("Owned task");
         owned.setStatus(TaskStatus.IN_PROGRESS);
         owned.setPriority(TaskPriority.HIGH);
         owned.setUserId(7L);
 
-        DeveloperTask other = new DeveloperTask();
-        other.setTitle("Other user task");
-        other.setStatus(TaskStatus.DONE);
-        other.setPriority(TaskPriority.LOW);
-        other.setUserId(99L);
-
-        when(taskRepository.findAll()).thenReturn(List.of(shared, owned, other));
+        when(currentUserService.currentUserId()).thenReturn(7L);
+        when(taskRepository.findAllByUserId(7L)).thenReturn(List.of(owned));
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("testuser", "Password123!", List.of())
         );
@@ -101,6 +83,6 @@ class TaskServiceTest {
         var responses = taskService.findAll();
 
         assertThat(responses).extracting(TaskResponse::title)
-                .containsExactly("Shared task", "Owned task");
+                .containsExactly("Owned task");
     }
 }

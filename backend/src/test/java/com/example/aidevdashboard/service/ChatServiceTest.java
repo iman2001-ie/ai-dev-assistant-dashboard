@@ -30,11 +30,15 @@ class ChatServiceTest {
     @Mock
     private AgentService agentService;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private ChatService chatService;
 
     @Test
     void sendSavesUserAndAssistantMessages() {
+        when(currentUserService.currentUserId()).thenReturn(7L);
         when(agentService.answer("What next?", null)).thenReturn("Make a plan.");
         when(chatMessageRepository.save(org.mockito.Mockito.any(ChatMessage.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -46,8 +50,10 @@ class ChatServiceTest {
         List<ChatMessage> savedMessages = captor.getAllValues();
         assertThat(savedMessages.get(0).getRole()).isEqualTo(ChatRole.USER);
         assertThat(savedMessages.get(0).getContent()).isEqualTo("What next?");
+        assertThat(savedMessages.get(0).getUserId()).isEqualTo(7L);
         assertThat(savedMessages.get(1).getRole()).isEqualTo(ChatRole.ASSISTANT);
         assertThat(savedMessages.get(1).getContent()).isEqualTo("Make a plan.");
+        assertThat(savedMessages.get(1).getUserId()).isEqualTo(7L);
         assertThat(response.userMessage().role()).isEqualTo(ChatRole.USER);
         assertThat(response.assistantMessage().role()).isEqualTo(ChatRole.ASSISTANT);
     }
@@ -57,7 +63,8 @@ class ChatServiceTest {
         ChatMessage message = new ChatMessage();
         message.setRole(ChatRole.USER);
         message.setContent("General question");
-        when(chatMessageRepository.findTop20ByErrorLogIsNullOrderByCreatedAtDesc()).thenReturn(List.of(message));
+        when(currentUserService.currentUserId()).thenReturn(7L);
+        when(chatMessageRepository.findTop20ByErrorLogIsNullAndUserIdOrderByCreatedAtDesc(7L)).thenReturn(List.of(message));
 
         assertThat(chatService.history(null, true))
                 .extracting("content")
@@ -67,11 +74,12 @@ class ChatServiceTest {
 
     @Test
     void clearHistoryDeletesOnlySelectedContext() {
+        when(currentUserService.currentUserId()).thenReturn(7L);
         when(errorLogService.getEntity(5L)).thenReturn(null);
 
         chatService.clearHistory(5L, false);
 
-        verify(chatMessageRepository).deleteByErrorLogId(5L);
+        verify(chatMessageRepository).deleteByErrorLogIdAndUserId(5L, 7L);
         verify(chatMessageRepository, never()).deleteAll();
     }
 }

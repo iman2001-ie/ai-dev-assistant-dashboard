@@ -87,4 +87,63 @@ public class AuthPerUserTaskIntegrationTest {
         ResponseEntity<String> aGetsB = restTemplate.exchange("/api/tasks/" + bId, HttpMethod.GET, new HttpEntity<>(headersA), String.class);
         assertThat(aGetsB.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
+
+    @Test
+    void logs_and_chat_history_are_scoped_to_user() {
+        HttpHeaders headersA = registerHeaders("logUserA", "logUserA@example.com");
+        HttpHeaders headersB = registerHeaders("logUserB", "logUserB@example.com");
+
+        Map<String, Object> logReqA = Map.of(
+                "title", "Log for A",
+                "content", "Only A should see this log",
+                "source", "frontend",
+                "resolved", false
+        );
+        ResponseEntity<Map> createLogA = restTemplate.postForEntity("/api/logs", new HttpEntity<>(logReqA, headersA), Map.class);
+        assertThat(createLogA.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        Long logAId = ((Number) createLogA.getBody().get("id")).longValue();
+
+        Map<String, Object> chatReqA = Map.of(
+                "message", "Help with A",
+                "errorLogId", logAId
+        );
+        ResponseEntity<Map> chatA = restTemplate.postForEntity("/api/chat", new HttpEntity<>(chatReqA, headersA), Map.class);
+        assertThat(chatA.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<List> logsA = restTemplate.exchange("/api/logs", HttpMethod.GET, new HttpEntity<>(headersA), List.class);
+        assertThat(logsA.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(logsA.getBody()).hasSize(1);
+        assertThat(((Map) logsA.getBody().get(0)).get("title")).isEqualTo("Log for A");
+
+        ResponseEntity<List> logsB = restTemplate.exchange("/api/logs", HttpMethod.GET, new HttpEntity<>(headersB), List.class);
+        assertThat(logsB.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(logsB.getBody()).isEmpty();
+
+        ResponseEntity<String> bGetsLogA = restTemplate.exchange("/api/logs/" + logAId, HttpMethod.GET, new HttpEntity<>(headersB), String.class);
+        assertThat(bGetsLogA.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        ResponseEntity<List> historyA = restTemplate.exchange("/api/chat/history?errorLogId=" + logAId, HttpMethod.GET, new HttpEntity<>(headersA), List.class);
+        assertThat(historyA.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(historyA.getBody()).hasSize(2);
+
+        ResponseEntity<String> historyB = restTemplate.exchange("/api/chat/history?errorLogId=" + logAId, HttpMethod.GET, new HttpEntity<>(headersB), String.class);
+        assertThat(historyB.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    private HttpHeaders registerHeaders(String username, String email) {
+        Map<String, String> request = Map.of(
+                "username", username,
+                "email", email,
+                "password", "Password123!"
+        );
+        ResponseEntity<Map> response = restTemplate.postForEntity("/api/auth/register", request, Map.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        String token = (String) response.getBody().get("token");
+        assertThat(token).isNotBlank();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
+    }
 }

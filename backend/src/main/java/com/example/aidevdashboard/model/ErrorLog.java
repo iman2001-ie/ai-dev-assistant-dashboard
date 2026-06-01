@@ -31,6 +31,9 @@ public class ErrorLog {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @PrePersist
     void onCreate() {
         createdAt = LocalDateTime.now();
@@ -74,5 +77,13 @@ public class ErrorLog {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }
