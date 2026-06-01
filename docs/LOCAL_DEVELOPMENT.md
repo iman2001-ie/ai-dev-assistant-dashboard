@@ -137,6 +137,8 @@ Email: testuser@example.com
 
 Login uses the username, not the email address.
 
+The script also assigns any unowned sample tasks, logs, and chat messages to that user. This keeps the seeded demo data visible without making it shared across every account.
+
 To create a different local user:
 
 ```powershell
@@ -174,6 +176,12 @@ If `testuser` already exists from a previous run, create a fresh one with a diff
 
 ```powershell
 .\scripts\create-dev-user.ps1 -Username freshuser -Email freshuser@example.com
+```
+
+If you want to create the user without claiming unowned sample data:
+
+```powershell
+.\scripts\create-dev-user.ps1 -SkipSeedDataAssignment
 ```
 
 ## Reset Local Development Database

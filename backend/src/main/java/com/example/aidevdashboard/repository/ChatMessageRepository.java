@@ -4,6 +4,8 @@ import com.example.aidevdashboard.model.ChatMessage;
 import com.example.aidevdashboard.model.ChatRole;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     List<ChatMessage> findTop20ByOrderByCreatedAtDesc();
@@ -31,4 +33,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     long countByRole(ChatRole role);
 
     long countByRoleAndUserId(ChatRole role, Long userId);
+
+    @Modifying
+    @Query("UPDATE ChatMessage message SET message.userId = :userId WHERE message.userId IS NULL")
+    int assignUnownedToUser(Long userId);
 }

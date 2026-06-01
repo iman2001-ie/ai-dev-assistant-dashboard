@@ -6,6 +6,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
+import com.example.aidevdashboard.model.ChatMessage;
+import com.example.aidevdashboard.model.ChatRole;
+import com.example.aidevdashboard.model.DeveloperTask;
+import com.example.aidevdashboard.model.ErrorLog;
+import com.example.aidevdashboard.model.TaskPriority;
+import com.example.aidevdashboard.model.TaskStatus;
+import com.example.aidevdashboard.repository.ChatMessageRepository;
+import com.example.aidevdashboard.repository.ErrorLogRepository;
+import com.example.aidevdashboard.repository.TaskRepository;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +30,15 @@ public class AuthPerUserTaskIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private ErrorLogRepository errorLogRepository;
+
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
 
     @Test
     void tasks_are_scoped_to_user() {
@@ -128,6 +146,44 @@ public class AuthPerUserTaskIntegrationTest {
 
         ResponseEntity<String> historyB = restTemplate.exchange("/api/chat/history?errorLogId=" + logAId, HttpMethod.GET, new HttpEntity<>(headersB), String.class);
         assertThat(historyB.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void authenticated_user_can_claim_unowned_seed_data() {
+        DeveloperTask seedTask = new DeveloperTask();
+        seedTask.setTitle("Seed task");
+        seedTask.setDescription("Unowned starter task");
+        seedTask.setStatus(TaskStatus.TODO);
+        seedTask.setPriority(TaskPriority.MEDIUM);
+        taskRepository.save(seedTask);
+
+        ErrorLog seedLog = new ErrorLog();
+        seedLog.setTitle("Seed log");
+        seedLog.setContent("Unowned starter log");
+        seedLog.setSource("backend");
+        seedLog.setResolved(false);
+        errorLogRepository.save(seedLog);
+
+        ChatMessage seedMessage = new ChatMessage();
+        seedMessage.setRole(ChatRole.ASSISTANT);
+        seedMessage.setContent("Unowned starter chat");
+        chatMessageRepository.save(seedMessage);
+
+        HttpHeaders headers = registerHeaders("seedOwner", "seedOwner@example.com");
+
+        ResponseEntity<Map> claim = restTemplate.postForEntity("/api/dev/claim-seed-data", new HttpEntity<>(null, headers), Map.class);
+        assertThat(claim.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(claim.getBody().get("tasksAssigned")).isEqualTo(1);
+        assertThat(claim.getBody().get("logsAssigned")).isEqualTo(1);
+        assertThat(claim.getBody().get("chatMessagesAssigned")).isEqualTo(1);
+
+        ResponseEntity<List> tasks = restTemplate.exchange("/api/tasks", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+        ResponseEntity<List> logs = restTemplate.exchange("/api/logs", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+        ResponseEntity<List> history = restTemplate.exchange("/api/chat/history?noContext=true", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+
+        assertThat(tasks.getBody()).extracting(item -> ((Map) item).get("title")).contains("Seed task");
+        assertThat(logs.getBody()).extracting(item -> ((Map) item).get("title")).contains("Seed log");
+        assertThat(history.getBody()).extracting(item -> ((Map) item).get("content")).contains("Unowned starter chat");
     }
 
     private HttpHeaders registerHeaders(String username, String email) {

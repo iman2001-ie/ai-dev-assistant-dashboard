@@ -2,7 +2,8 @@ param(
     [string] $Username = "testuser",
     [string] $Email = "testuser@example.com",
     [string] $Password = "Password123!",
-    [string] $ApiBaseUrl = "http://localhost:8080/api"
+    [string] $ApiBaseUrl = "http://localhost:8080/api",
+    [switch] $SkipSeedDataAssignment
 )
 
 $ErrorActionPreference = "Stop"
@@ -52,16 +53,60 @@ function Read-ErrorMessage {
     }
 }
 
-try {
-    $response = Invoke-RestMethod `
+function Assign-UnownedSeedData {
+    param(
+        [string] $TargetUsername,
+        [string] $Token
+    )
+
+    if ($SkipSeedDataAssignment) {
+        return
+    }
+
+    if (-not $Token) {
+        Write-Output "Skipped seed data assignment because no login token is available."
+        return
+    }
+
+    try {
+        $response = Invoke-RestMethod `
+            -Method Post `
+            -Uri "$ApiBaseUrl/dev/claim-seed-data" `
+            -Headers @{ Authorization = "Bearer $Token" }
+
+        Write-Output "Assigned unowned seed data to $TargetUsername."
+        Write-Output "Tasks assigned: $($response.tasksAssigned)"
+        Write-Output "Logs assigned: $($response.logsAssigned)"
+        Write-Output "Chat messages assigned: $($response.chatMessagesAssigned)"
+    } catch {
+        Write-Output "Could not assign seed data through the backend."
+        Write-Output "Make sure the backend includes /api/dev/claim-seed-data and is running at $ApiBaseUrl."
+    }
+}
+
+function Register-User {
+    return Invoke-RestMethod `
         -Method Post `
         -Uri "$ApiBaseUrl/auth/register" `
         -ContentType "application/json" `
         -Body $body
+}
+
+function Login-User {
+    return Invoke-RestMethod `
+        -Method Post `
+        -Uri "$ApiBaseUrl/auth/login" `
+        -ContentType "application/json" `
+        -Body $body
+}
+
+try {
+    $response = Register-User
 
     Write-Output "Created local development user."
     Write-Output "Username: $($response.username)"
     Write-Output "Password: $Password"
+    Assign-UnownedSeedData -TargetUsername $response.username -Token $response.token
 } catch {
     $response = $_.Exception.Response
     $statusCode = if ($response) { [int]$response.StatusCode } else { $null }
@@ -78,6 +123,12 @@ try {
         Write-Output "User was not created."
         if ($errorMessage) {
             Write-Output "Backend message: $errorMessage"
+        }
+        try {
+            $loginResponse = Login-User
+            Assign-UnownedSeedData -TargetUsername $loginResponse.username -Token $loginResponse.token
+        } catch {
+            Write-Output "Could not log in as $Username to assign seed data."
         }
         Write-Output "If you want a fresh account, try a different username/email pair."
         Write-Output "Example:"
