@@ -143,6 +143,39 @@ To create a different local user:
 .\scripts\create-dev-user.ps1 -Username demo -Email demo@example.com -Password "Password123!"
 ```
 
+If you want to do the whole flow manually after a clean reset, use this order:
+
+1. Reset the local database:
+
+   ```powershell
+   .\scripts\reset-dev-db.ps1
+   ```
+
+2. Start the backend and wait until Spring Boot reports that it started:
+
+   ```powershell
+   .\scripts\start-backend.ps1
+   ```
+
+3. Create the local user:
+
+   ```powershell
+   .\scripts\create-dev-user.ps1
+   ```
+
+4. Start the frontend in a separate terminal if it is not already running:
+
+   ```powershell
+   cd frontend
+   npm run dev
+   ```
+
+If `testuser` already exists from a previous run, create a fresh one with a different username/email instead of waiting for the script to retry:
+
+```powershell
+.\scripts\create-dev-user.ps1 -Username freshuser -Email freshuser@example.com
+```
+
 ## Reset Local Development Database
 
 Only use this for local Docker development data. It deletes the project Docker PostgreSQL volume and starts a fresh database container:
