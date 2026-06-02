@@ -1,7 +1,19 @@
 # Deferred Work
 
-## Deferred from: code review of 1-1-decide-authentication-approach.md (2026-05-28)
+## Resolved During Wrap-Up (2026-06-02)
 
-- README API overview omits auth endpoints and Bearer-token requirements [README.md:148]. Existing README/API docs were already stale relative to the current auth implementation; address in a focused README/API documentation cleanup.
-- README development notes do not expose the docs index or auth decision [README.md:182]. Existing contributor entry point can be improved separately from Story 1.1.
-- README roadmap still frames authentication as future work [README.md:190]. Existing roadmap needs a status refresh now that auth work exists.
+The following deferred documentation items from the Story 1.1 code review were addressed:
+
+- README API overview now includes auth/account endpoints and Bearer-token requirements.
+- README development notes now link to the docs index and auth decision.
+- README roadmap no longer frames authentication as future work.
+
+## Still Deferred
+
+- Refresh README screenshots and demo walkthrough assets.
+- Add smoke E2E tests for login, task creation, error-log creation/deletion, assistant chat, and account deletion.
+- Add task due dates and tags.
+- Improve assistant conversation grouping.
+- Add streaming assistant responses.
+- Add production Dockerfiles for frontend and backend.
+- Decide whether the original agent-list/run-control dashboard work still belongs in this product.

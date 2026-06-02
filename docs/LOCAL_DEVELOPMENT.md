@@ -119,7 +119,9 @@ backend/src/main/resources/db/setup-local-postgres.sql
 
 ## Local Auth Users
 
-The app currently supports normal registered users. It does not have roles or a real admin/super-user model yet.
+The app supports normal registered users. It does not have roles or a real admin/super-user model yet.
+
+Users can also register through the frontend. Login uses the username, not the email address.
 
 To create a local development user after the backend is running:
 
@@ -184,6 +186,20 @@ If you want to create the user without claiming unowned sample data:
 .\scripts\create-dev-user.ps1 -SkipSeedDataAssignment
 ```
 
+## Account Management
+
+Authenticated users can open the account page from the username shown in the sidebar.
+
+Current account behavior:
+
+- Username and email can be updated from the account page.
+- Password changes require the current password and a new password.
+- The current password is never loaded into the profile form.
+- Account deletion requires a confirmation message.
+- Deleting an account removes that user's local tasks, logs, and chat history.
+
+This is intentionally simple local-MVP account management. There is no forgot-password email flow yet; the frontend includes a placeholder forgot-password page for future work.
+
 ## Reset Local Development Database
 
 Only use this for local Docker development data. It stops the local app, deletes the project Docker PostgreSQL volume, and starts a fresh database container:
@@ -209,6 +225,8 @@ If an old account still logs in after a reset, check two things:
 
 1. Make sure the backend was restarted after the reset. Old browser tokens may still show a username until the frontend makes a fresh API request.
 2. Check `.env.local` for a custom `DATABASE_URL`. The reset script only clears the Docker database from `docker-compose.yml`.
+
+If the UI still behaves as if an old user is signed in, use the Logout button or clear browser local storage for `127.0.0.1:5173` / `localhost:5173`, then log in again.
 
 ## Useful Commands
 
@@ -255,3 +273,16 @@ backend/src/main/resources/db/migration
 ```
 
 Flyway runs automatically when the backend starts.
+
+## Generated Files
+
+The following paths are local/generated and are ignored by Git:
+
+- `.runtime/`
+- `backend/target/`
+- `frontend/node_modules/`
+- `frontend/dist/`
+- `frontend/tsconfig.tsbuildinfo`
+- `*.log`
+
+They can be deleted when you want a clean local workspace. Do not delete `.env.local` unless you intentionally want to remove private local configuration.

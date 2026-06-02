@@ -6,6 +6,13 @@
 - **[auth-decision.md](./auth-decision.md)** - Authentication approach and API contract
 - **[project-overview.md](./project-overview.md)** - High-level project summary and quickstart
 - **[SECRETS.md](./SECRETS.md)** - Guidance on handling secrets and API keys
+- **[sprint1-tasks.md](./sprint1-tasks.md)** - Sprint 1 task tracker and wrap-up notes
+
+## BMAD Artifacts
+
+- **[_bmad-output/planning-artifacts/epics.md](../_bmad-output/planning-artifacts/epics.md)** - BMAD-compatible epic and story breakdown
+- **[_bmad-output/implementation-artifacts/sprint-status.yaml](../_bmad-output/implementation-artifacts/sprint-status.yaml)** - BMAD sprint status tracker
+- **[_bmad-output/implementation-artifacts/deferred-work.md](../_bmad-output/implementation-artifacts/deferred-work.md)** - Deferred work captured during implementation
 
 ## Subdirectories
 

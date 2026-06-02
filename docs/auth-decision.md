@@ -30,12 +30,19 @@ login, refresh, and logout flows.
   - `POST /api/auth/refresh`
 - Protected auth endpoint:
   - `POST /api/auth/logout`
+- Protected account endpoints:
+  - `GET /api/auth/me`
+  - `PUT /api/auth/me`
+  - `DELETE /api/auth/me`
 - Protected app endpoints require an `Authorization: Bearer <jwt>` header.
 - Access tokens are signed by the backend using `app.jwt.secret`.
 - Access token lifetime is controlled by `app.jwt.expiration-seconds`.
 - Refresh tokens are opaque UUID values stored with the user record.
 - Login and refresh rotate the refresh token.
 - Logout clears the stored refresh token for the authenticated user.
+- Profile updates can change username and email.
+- Password changes require the user's current password.
+- Account deletion removes the user's local tasks, logs, and chat history.
 - The frontend stores the access token and refresh token in `localStorage`.
 
 ## Session Policy
@@ -47,6 +54,8 @@ the current request only.
 
 ## Follow-Up Notes
 
+- The forgot-password route is currently a frontend placeholder only.
+- There is no role or admin/super-user model yet.
 - For a production app, revisit frontend token storage and CSRF/XSS hardening.
 - Keep auth schema changes in Flyway migrations.
 - Keep protected route behavior aligned between backend security rules and the

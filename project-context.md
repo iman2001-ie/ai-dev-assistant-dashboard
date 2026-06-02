@@ -2,7 +2,8 @@
 project_name: "AI Dev Assistant Dashboard"
 user_name: "iman.entezari"
 date: 2026-05-27
-sections_completed: ["technology_stack","critical_rules"]
+last_updated: 2026-06-02
+sections_completed: ["technology_stack","critical_rules","current_mvp_status"]
 existing_patterns_found: 6
 ---
 
@@ -17,6 +18,14 @@ _This file captures unobvious rules and patterns agents must follow when impleme
 - Database: PostgreSQL (local via docker-compose). Flyway for migrations.
 - Tooling: npm (frontend), Maven (backend), ESLint, TypeScript compiler (tsc).
 
+## Current MVP Status
+
+- The app has username/password auth, JWT access tokens, server-side refresh tokens, protected frontend routes, and account management.
+- Tasks, error logs, and chat history are scoped per authenticated user by `user_id`.
+- Local sample data can be claimed by a development user through `scripts\create-dev-user.ps1`.
+- The forgot-password route is a frontend placeholder only.
+- There is no role/admin/super-user model yet.
+
 ## Critical Implementation Rules (high priority)
 
 1. Database changes MUST use Flyway migrations. Add SQL migration files under backend/src/main/resources/db/migration and test locally before PR.
@@ -27,6 +36,8 @@ _This file captures unobvious rules and patterns agents must follow when impleme
 6. Use provided start/stop scripts for local stacks: `scripts\start-dev.ps1`, `scripts\stop-dev.ps1`, and `docker compose` for DB consistency.
 7. Prefer small, focused PRs with clear acceptance criteria and automated tests where practical. Include migration and data-migration notes when altering schemas.
 8. Avoid time estimates in messages; instead state scope and required follow-ups.
+9. Preserve per-user data isolation when adding task, log, chat, or dashboard behavior.
+10. Treat `_bmad-output/` as planning history and sprint evidence, not runtime output.
 
 ## Code Organization Notes
 
@@ -42,5 +53,5 @@ _This file captures unobvious rules and patterns agents must follow when impleme
 ## Next recommended actions
 
 - Index docs for LLM consumption: run `bmad-index-docs`.
-- Create or update PRD using `bmad-prd` once planning artifacts are ready.
+- Refresh demo screenshots/walkthrough once the public UI is ready for a new capture pass.
 
