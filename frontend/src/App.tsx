@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
+import AccountPage from './pages/AccountPage';
 import AssistantPage from './pages/AssistantPage';
 import DashboardPage from './pages/DashboardPage';
 import LogsPage from './pages/LogsPage';
@@ -24,6 +25,7 @@ function AppRoutes() {
             <Route path="/tasks" element={<TasksPage />} />
             <Route path="/logs" element={<LogsPage />} />
             <Route path="/assistant" element={<AssistantPage />} />
+            <Route path="/account" element={<AccountPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>

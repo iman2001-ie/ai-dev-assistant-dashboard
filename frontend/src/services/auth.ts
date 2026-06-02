@@ -55,6 +55,37 @@ export async function refresh() {
   return json;
 }
 
+export interface UserProfile {
+  username: string;
+  email: string;
+}
+
+export interface ProfileUpdatePayload {
+  username: string;
+  email: string;
+  currentPassword?: string;
+  newPassword?: string;
+}
+
+export async function getProfile() {
+  const res = await fetchWithAuth(`${API_BASE_URL}/auth/me`);
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw json || { message: 'Could not load profile' };
+  return json as UserProfile;
+}
+
+export async function updateProfile(payload: ProfileUpdatePayload) {
+  const res = await fetchWithAuth(`${API_BASE_URL}/auth/me`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw json || { message: 'Could not update profile' };
+  setTokens(json.token, json.refreshToken);
+  return json as UserProfile & { token: string; refreshToken: string };
+}
+
 export async function logout() {
   const token = getToken();
   try {

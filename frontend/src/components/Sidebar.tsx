@@ -31,12 +31,13 @@ export default function Sidebar() {
         ))}
       </nav>
       <div style={styles.userSection}>
-        <div className="sidebar-account">
-          <p className="sidebar-account-label">Logged in as</p>
-          <button className="sidebar-account-button" type="button" title="Account settings coming later">
-            {currentUser}
-          </button>
-        </div>
+        <NavLink to="/account" className="sidebar-account-link">
+          <span className="sidebar-account-avatar">{(currentUser ?? 'U').slice(0, 1).toUpperCase()}</span>
+          <span className="sidebar-account-copy">
+            <span className="sidebar-account-label">Signed in</span>
+            <span className="sidebar-account-name">{currentUser}</span>
+          </span>
+        </NavLink>
         <button onClick={handleLogout} style={styles.logoutButton}>
           Logout
         </button>

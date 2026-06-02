@@ -158,6 +158,87 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
+    void profileCanBeReadAndUpdated() {
+        Map<String, String> req = Map.of(
+                "username", "profileuser",
+                "email", "profile@example.com",
+                "password", "Password123!"
+        );
+        ResponseEntity<Map> register = restTemplate.postForEntity("/api/auth/register", req, Map.class);
+        assertThat(register.getStatusCode()).isEqualTo(HttpStatus.OK);
+        String token = (String) register.getBody().get("token");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<Map> profile = restTemplate.exchange("/api/auth/me", HttpMethod.GET, new HttpEntity<>(headers), Map.class);
+        assertThat(profile.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(profile.getBody().get("username")).isEqualTo("profileuser");
+        assertThat(profile.getBody().get("email")).isEqualTo("profile@example.com");
+
+        Map<String, String> updateReq = Map.of(
+                "username", "profileuser2",
+                "email", "profile2@example.com",
+                "currentPassword", "Password123!",
+                "newPassword", "Password456!"
+        );
+        ResponseEntity<Map> update = restTemplate.exchange("/api/auth/me", HttpMethod.PUT, new HttpEntity<>(updateReq, headers), Map.class);
+        assertThat(update.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(update.getBody().get("username")).isEqualTo("profileuser2");
+        assertThat(update.getBody().get("email")).isEqualTo("profile2@example.com");
+        assertThat(update.getBody().get("token")).isNotNull();
+        assertThat(update.getBody().get("refreshToken")).isNotNull();
+
+        ResponseEntity<Map> oldLogin = restTemplate.postForEntity("/api/auth/login", Map.of(
+                "username", "profileuser",
+                "password", "Password123!"
+        ), Map.class);
+        assertThat(oldLogin.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        ResponseEntity<Map> newLogin = restTemplate.postForEntity("/api/auth/login", Map.of(
+                "username", "profileuser2",
+                "password", "Password456!"
+        ), Map.class);
+        assertThat(newLogin.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void profileUpdateRejectsDuplicateUsernameAndEmail() {
+        ResponseEntity<Map> first = restTemplate.postForEntity("/api/auth/register", Map.of(
+                "username", "profileduplicate1",
+                "email", "profileduplicate1@example.com",
+                "password", "Password123!"
+        ), Map.class);
+        assertThat(first.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<Map> second = restTemplate.postForEntity("/api/auth/register", Map.of(
+                "username", "profileduplicate2",
+                "email", "profileduplicate2@example.com",
+                "password", "Password123!"
+        ), Map.class);
+        assertThat(second.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth((String) second.getBody().get("token"));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<Map> duplicateUsername = restTemplate.exchange("/api/auth/me", HttpMethod.PUT, new HttpEntity<>(Map.of(
+                "username", "profileduplicate1",
+                "email", "profileduplicate2@example.com"
+        ), headers), Map.class);
+        assertThat(duplicateUsername.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(duplicateUsername.getBody().get("message")).isEqualTo("Username already exists");
+
+        ResponseEntity<Map> duplicateEmail = restTemplate.exchange("/api/auth/me", HttpMethod.PUT, new HttpEntity<>(Map.of(
+                "username", "profileduplicate2",
+                "email", "profileduplicate1@example.com"
+        ), headers), Map.class);
+        assertThat(duplicateEmail.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(duplicateEmail.getBody().get("message")).isEqualTo("Email already exists");
+    }
+
+    @Test
     void protectedEndpoint_rejectsInvalidBearerToken() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth("not-a-valid-jwt");

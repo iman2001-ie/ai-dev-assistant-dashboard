@@ -4,10 +4,17 @@ public class AuthResponse {
     private String token;
     private String username;
     private String refreshToken;
+    private String email;
 
     public AuthResponse() {}
     public AuthResponse(String token, String username) { this.token = token; this.username = username; }
     public AuthResponse(String token, String username, String refreshToken) { this.token = token; this.username = username; this.refreshToken = refreshToken; }
+    public AuthResponse(String token, String username, String refreshToken, String email) {
+        this.token = token;
+        this.username = username;
+        this.refreshToken = refreshToken;
+        this.email = email;
+    }
 
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
@@ -15,4 +22,6 @@ public class AuthResponse {
     public void setUsername(String username) { this.username = username; }
     public String getRefreshToken() { return refreshToken; }
     public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }

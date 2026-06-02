@@ -2,6 +2,7 @@ package com.example.aidevdashboard.service;
 
 import com.example.aidevdashboard.model.User;
 import com.example.aidevdashboard.repository.UserRepository;
+import java.util.Optional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +15,20 @@ public class CurrentUserService {
     }
 
     public Long currentUserId() {
+        return currentUser().map(User::getId).orElse(null);
+    }
+
+    public Optional<User> currentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            return null;
+            return Optional.empty();
         }
 
         String username = auth.getName();
         if (username == null) {
-            return null;
+            return Optional.empty();
         }
 
-        return userRepository.findByUsername(username).map(User::getId).orElse(null);
+        return userRepository.findByUsername(username);
     }
 }

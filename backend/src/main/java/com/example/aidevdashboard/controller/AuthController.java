@@ -2,6 +2,8 @@ package com.example.aidevdashboard.controller;
 
 import com.example.aidevdashboard.dto.AuthRequest;
 import com.example.aidevdashboard.dto.AuthResponse;
+import com.example.aidevdashboard.dto.ProfileUpdateRequest;
+import com.example.aidevdashboard.dto.UserProfileResponse;
 import com.example.aidevdashboard.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,16 @@ public class AuthController {
         String refreshToken = body.get("refreshToken");
         AuthResponse resp = authService.refresh(refreshToken);
         return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponse> me() {
+        return ResponseEntity.ok(authService.currentProfile());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<AuthResponse> updateProfile(@RequestBody ProfileUpdateRequest req) {
+        return ResponseEntity.ok(authService.updateProfile(req));
     }
 
     @PostMapping("/logout")

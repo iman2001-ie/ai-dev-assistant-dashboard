@@ -8,6 +8,7 @@ interface AuthContextType {
   error: string | null;
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
+  updateProfile: (payload: authService.ProfileUpdatePayload) => Promise<authService.UserProfile>;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -86,6 +87,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleUpdateProfile = async (payload: authService.ProfileUpdatePayload) => {
+    setError(null);
+    try {
+      const result = await authService.updateProfile(payload);
+      setCurrentUser(result.username);
+      setIsAuthenticated(true);
+      return result;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Profile update failed';
+      setError(message);
+      throw err;
+    }
+  };
+
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -109,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error,
         login: handleLogin,
         register: handleRegister,
+        updateProfile: handleUpdateProfile,
         logout: handleLogout,
         clearError,
       }}

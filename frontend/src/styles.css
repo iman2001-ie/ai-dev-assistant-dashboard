@@ -112,39 +112,54 @@ pre {
   color: white;
 }
 
-.sidebar-account {
-  display: grid;
-  gap: 0.35rem;
+.sidebar .sidebar-account-link {
+  align-items: center;
+  border: 1px solid #33466f;
+  display: flex;
+  gap: 0.75rem;
   margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  padding: 0.7rem 0.75rem;
+}
+
+.sidebar-account-avatar {
+  align-items: center;
+  background: #e0f2fe;
+  border-radius: 999px;
+  color: #075985;
+  display: inline-flex;
+  flex: 0 0 34px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.sidebar-account-copy {
+  display: grid;
+  min-width: 0;
 }
 
 .sidebar-account-label {
-  color: #cbd5e1 !important;
-  font-size: 0.75rem;
+  color: #aebbd2;
+  font-size: 0.72rem;
   font-weight: 700;
-  margin: 0;
   text-transform: uppercase;
 }
 
-.sidebar-account-button {
-  background: #f8fafc;
-  border: 1px solid #dbeafe;
-  border-radius: 6px;
-  color: #14213d;
-  min-height: 44px;
+.sidebar-account-name {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 800;
   overflow: hidden;
-  padding: 0.65rem 0.8rem;
-  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 100%;
 }
 
-.sidebar-account-button:hover,
-.sidebar-account-button:focus-visible {
-  background: #eff6ff;
-  color: #0f172a;
+.sidebar .sidebar-account-link.active,
+.sidebar .sidebar-account-link:hover {
+  background: #20345f;
+  border-color: #5e7fc4;
 }
 
 .main-content {
@@ -448,6 +463,56 @@ pre {
   padding: 0.85rem 1rem;
 }
 
+.success-banner {
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  color: #166534;
+  padding: 0.85rem 1rem;
+}
+
+.account-grid {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(220px, 0.45fr) minmax(340px, 1fr);
+}
+
+.account-summary {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #dde5ef;
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.account-summary h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.account-summary p {
+  color: #64748b;
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.account-avatar {
+  align-items: center;
+  background: #dbeafe;
+  border-radius: 999px;
+  color: #1e40af;
+  display: inline-flex;
+  flex: 0 0 48px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
 .empty {
   color: #64748b;
   margin: 0;
@@ -467,7 +532,8 @@ pre {
   }
 
   .summary-grid,
-  .content-grid {
+  .content-grid,
+  .account-grid {
     grid-template-columns: 1fr;
   }
 }

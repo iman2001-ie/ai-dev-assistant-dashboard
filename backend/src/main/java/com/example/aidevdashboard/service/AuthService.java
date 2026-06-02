@@ -2,6 +2,8 @@ package com.example.aidevdashboard.service;
 
 import com.example.aidevdashboard.dto.AuthRequest;
 import com.example.aidevdashboard.dto.AuthResponse;
+import com.example.aidevdashboard.dto.ProfileUpdateRequest;
+import com.example.aidevdashboard.dto.UserProfileResponse;
 import com.example.aidevdashboard.model.User;
 import com.example.aidevdashboard.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,11 +15,18 @@ public class AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final CurrentUserService currentUserService;
 
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(
+            UserRepository userRepository,
+            BCryptPasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil,
+            CurrentUserService currentUserService
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.currentUserService = currentUserService;
     }
 
     public AuthResponse register(AuthRequest req) {
@@ -36,7 +45,7 @@ public class AuthService {
         u.setRefreshToken(refresh);
         userRepository.save(u);
         String jwt = jwtUtil.generateToken(u.getUsername());
-        return new AuthResponse(jwt, u.getUsername(), refresh);
+        return new AuthResponse(jwt, u.getUsername(), refresh, u.getEmail());
     }
 
     public AuthResponse login(AuthRequest req) {
@@ -47,7 +56,7 @@ public class AuthService {
         u.setRefreshToken(refresh);
         userRepository.save(u);
         String jwt = jwtUtil.generateToken(u.getUsername());
-        return new AuthResponse(jwt, u.getUsername(), refresh);
+        return new AuthResponse(jwt, u.getUsername(), refresh, u.getEmail());
     }
 
     public AuthResponse refresh(String refreshToken) {
@@ -60,7 +69,7 @@ public class AuthService {
         u.setRefreshToken(newRefresh);
         userRepository.save(u);
         String jwt = jwtUtil.generateToken(u.getUsername());
-        return new AuthResponse(jwt, u.getUsername(), newRefresh);
+        return new AuthResponse(jwt, u.getUsername(), newRefresh, u.getEmail());
     }
 
     public void logout(String username) {
@@ -68,5 +77,64 @@ public class AuthService {
             u.setRefreshToken(null);
             userRepository.save(u);
         });
+    }
+
+    public UserProfileResponse currentProfile() {
+        User user = currentUserService.currentUser()
+                .orElseThrow(() -> new AuthException("Login is required"));
+        return new UserProfileResponse(user.getUsername(), user.getEmail());
+    }
+
+    public AuthResponse updateProfile(ProfileUpdateRequest req) {
+        User user = currentUserService.currentUser()
+                .orElseThrow(() -> new AuthException("Login is required"));
+
+        String username = normalize(req.getUsername());
+        String email = normalize(req.getEmail());
+        if (username == null) {
+            throw new AuthException("Username is required");
+        }
+        if (email == null || !email.contains("@")) {
+            throw new AuthException("Valid email is required");
+        }
+
+        userRepository.findByUsername(username)
+                .filter(existing -> !existing.getId().equals(user.getId()))
+                .ifPresent(existing -> {
+                    throw new AuthException("Username already exists");
+                });
+        userRepository.findByEmail(email)
+                .filter(existing -> !existing.getId().equals(user.getId()))
+                .ifPresent(existing -> {
+                    throw new AuthException("Email already exists");
+                });
+
+        String newPassword = normalize(req.getNewPassword());
+        if (newPassword != null) {
+            String currentPassword = normalize(req.getCurrentPassword());
+            if (currentPassword == null || !passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+                throw new AuthException("Current password is incorrect");
+            }
+            if (newPassword.length() < 6) {
+                throw new AuthException("New password must be at least 6 characters");
+            }
+            user.setPasswordHash(passwordEncoder.encode(newPassword));
+        }
+
+        user.setUsername(username);
+        user.setEmail(email);
+        String refresh = java.util.UUID.randomUUID().toString();
+        user.setRefreshToken(refresh);
+        userRepository.save(user);
+
+        String jwt = jwtUtil.generateToken(user.getUsername());
+        return new AuthResponse(jwt, user.getUsername(), refresh, user.getEmail());
+    }
+
+    private String normalize(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
     }
 }
