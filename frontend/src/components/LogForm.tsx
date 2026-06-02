@@ -48,7 +48,7 @@ export default function LogForm({ initialLog, onSubmit, onCancel }: LogFormProps
           required
           value={form.title}
           onChange={(event) => setForm({ ...form, title: event.target.value })}
-          placeholder="Database connection refused"
+          placeholder="Short summary, e.g. Login returns 500"
         />
       </label>
       <label>
@@ -56,7 +56,7 @@ export default function LogForm({ initialLog, onSubmit, onCancel }: LogFormProps
         <input
           value={form.source}
           onChange={(event) => setForm({ ...form, source: event.target.value })}
-          placeholder="backend, frontend, CI"
+          placeholder="Where it happened, e.g. backend, frontend, CI"
         />
       </label>
       <label>
@@ -66,7 +66,7 @@ export default function LogForm({ initialLog, onSubmit, onCancel }: LogFormProps
           className="log-textarea"
           value={form.content}
           onChange={(event) => setForm({ ...form, content: event.target.value })}
-          placeholder="Paste stack trace or error output"
+          placeholder="Paste the full stack trace, console error, or failed command output"
         />
       </label>
       <label className="checkbox">

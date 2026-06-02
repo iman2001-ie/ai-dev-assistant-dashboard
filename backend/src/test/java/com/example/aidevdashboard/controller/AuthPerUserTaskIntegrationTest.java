@@ -146,6 +146,13 @@ public class AuthPerUserTaskIntegrationTest {
 
         ResponseEntity<String> historyB = restTemplate.exchange("/api/chat/history?errorLogId=" + logAId, HttpMethod.GET, new HttpEntity<>(headersB), String.class);
         assertThat(historyB.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        ResponseEntity<Void> deleteLogA = restTemplate.exchange("/api/logs/" + logAId, HttpMethod.DELETE, new HttpEntity<>(headersA), Void.class);
+        assertThat(deleteLogA.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<List> logsAfterDeleteA = restTemplate.exchange("/api/logs", HttpMethod.GET, new HttpEntity<>(headersA), List.class);
+        assertThat(logsAfterDeleteA.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(logsAfterDeleteA.getBody()).isEmpty();
     }
 
     @Test

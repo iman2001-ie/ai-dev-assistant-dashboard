@@ -3,6 +3,7 @@ package com.example.aidevdashboard.service;
 import com.example.aidevdashboard.dto.LogRequest;
 import com.example.aidevdashboard.dto.LogResponse;
 import com.example.aidevdashboard.model.ErrorLog;
+import com.example.aidevdashboard.repository.ChatMessageRepository;
 import com.example.aidevdashboard.repository.ErrorLogRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ErrorLogService {
     private final ErrorLogRepository errorLogRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final CurrentUserService currentUserService;
 
-    public ErrorLogService(ErrorLogRepository errorLogRepository, CurrentUserService currentUserService) {
+    public ErrorLogService(
+            ErrorLogRepository errorLogRepository,
+            ChatMessageRepository chatMessageRepository,
+            CurrentUserService currentUserService
+    ) {
         this.errorLogRepository = errorLogRepository;
+        this.chatMessageRepository = chatMessageRepository;
         this.currentUserService = currentUserService;
     }
 
@@ -80,6 +87,12 @@ public class ErrorLogService {
     @Transactional
     public void delete(Long id) {
         ErrorLog log = getEntity(id);
+        Long userId = currentUserService.currentUserId();
+        if (userId == null) {
+            chatMessageRepository.deleteByErrorLogId(id);
+        } else {
+            chatMessageRepository.deleteByErrorLogIdAndUserId(id, userId);
+        }
         errorLogRepository.delete(log);
     }
 

@@ -48,7 +48,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
           required
           value={form.title}
           onChange={(event) => setForm({ ...form, title: event.target.value })}
-          placeholder="Fix failing integration test"
+          placeholder="Brief task name, e.g. Add login error message"
         />
       </label>
       <label>
