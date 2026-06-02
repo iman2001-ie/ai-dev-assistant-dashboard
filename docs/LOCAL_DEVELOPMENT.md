@@ -296,3 +296,26 @@ node scripts\capture-readme-screenshots.mjs
 ```
 
 The script logs in as `testuser` by default, captures the main app pages at a fixed desktop viewport, and writes images to `docs/screenshots/`. It uses the `React state update warning` error log as the AI Assistant context when available.
+
+## Refresh README Demo
+
+The README walkthrough is generated from the live local app. Before running it, make sure:
+
+- PostgreSQL, the backend, and the frontend are running.
+- `testuser` can log in with the default local password.
+- FFmpeg is installed and available on `PATH`.
+
+Then run:
+
+```powershell
+node scripts\capture-readme-demo-video.mjs
+```
+
+The script opens a Chromium-based browser, records the app with FFmpeg, logs in as `testuser`, creates fresh `Demo:` task and error-log records, asks the assistant about the new log, previews the account page, and writes:
+
+```text
+docs/demo/walkthrough.mp4
+docs/demo/walkthrough.gif
+```
+
+The script deletes old `Demo:` tasks and logs for `testuser` before recording so the walkthrough stays repeatable.

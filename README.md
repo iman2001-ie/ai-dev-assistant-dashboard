@@ -31,7 +31,9 @@ The assistant works without an OpenAI API key by returning mock responses. If `O
 
 ## Demo
 
-The app currently runs locally. The walkthrough below uses sample development data to show task creation, task editing, error log tracking, and an AI-assisted debugging chat.
+The app currently runs locally. The walkthrough below logs in as `testuser`, opens the dashboard, creates and edits a task, saves a new error log, asks the AI assistant about that log, previews account settings, and returns to the dashboard.
+
+The README uses the GIF for easy viewing on GitHub. A higher-quality MP4 version is also available at [`docs/demo/walkthrough.mp4`](docs/demo/walkthrough.mp4).
 
 ![AI Dev Assistant Dashboard walkthrough](docs/demo/walkthrough.gif)
 
@@ -298,7 +300,6 @@ npx tsc -b
 
 ## Roadmap
 
-- Refresh README demo assets and screenshots
 - Add task due dates and tags
 - Improve assistant conversation grouping
 - Add streaming AI responses
