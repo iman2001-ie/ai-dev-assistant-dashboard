@@ -87,12 +87,7 @@ public class ErrorLogService {
     @Transactional
     public void delete(Long id) {
         ErrorLog log = getEntity(id);
-        Long userId = currentUserService.currentUserId();
-        if (userId == null) {
-            chatMessageRepository.deleteByErrorLogId(id);
-        } else {
-            chatMessageRepository.deleteByErrorLogIdAndUserId(id, userId);
-        }
+        chatMessageRepository.deleteByErrorLogId(id);
         errorLogRepository.delete(log);
     }
 

@@ -128,6 +128,12 @@ public class AuthPerUserTaskIntegrationTest {
         ResponseEntity<Map> chatA = restTemplate.postForEntity("/api/chat", new HttpEntity<>(chatReqA, headersA), Map.class);
         assertThat(chatA.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        ChatMessage unownedAttachedMessage = new ChatMessage();
+        unownedAttachedMessage.setRole(ChatRole.ASSISTANT);
+        unownedAttachedMessage.setContent("Older unowned chat attached to A's log");
+        unownedAttachedMessage.setErrorLog(errorLogRepository.findById(logAId).orElseThrow());
+        chatMessageRepository.save(unownedAttachedMessage);
+
         ResponseEntity<List> logsA = restTemplate.exchange("/api/logs", HttpMethod.GET, new HttpEntity<>(headersA), List.class);
         assertThat(logsA.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(logsA.getBody()).hasSize(1);
