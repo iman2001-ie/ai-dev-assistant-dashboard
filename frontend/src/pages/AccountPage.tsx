@@ -22,6 +22,7 @@ export default function AccountPage() {
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [changePassword, setChangePassword] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [message, setMessage] = useState('');
@@ -43,18 +44,25 @@ export default function AccountPage() {
     setError('');
     setMessage('');
 
+    if (changePassword && (!currentPassword || !newPassword)) {
+      setError('Enter your current password and a new password to change your password.');
+      setSaving(false);
+      return;
+    }
+
     try {
       const updated = await updateProfile({
         username,
         email,
-        currentPassword: currentPassword || undefined,
-        newPassword: newPassword || undefined,
+        currentPassword: changePassword ? currentPassword : undefined,
+        newPassword: changePassword ? newPassword : undefined,
       });
       setProfile({ username: updated.username, email: updated.email });
       setUsername(updated.username);
       setEmail(updated.email);
       setCurrentPassword('');
       setNewPassword('');
+      setChangePassword(false);
       setMessage('Account updated.');
     } catch (err: unknown) {
       setError(errorMessage(err, 'Could not update account'));
@@ -101,87 +109,108 @@ export default function AccountPage() {
           </div>
         </section>
 
-        <Card title="Profile">
-          <form className="form stack" onSubmit={handleSubmit}>
-            <label>
-              Username
-              <input value={username} onChange={(event) => setUsername(event.target.value)} required />
-            </label>
-            <label>
-              Email
-              <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-            </label>
-            <div className="form-row">
+        <div className="account-main">
+          <Card title="Profile">
+            <form className="form stack" onSubmit={handleSubmit} autoComplete="off">
               <label>
-                Current password
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(event) => setCurrentPassword(event.target.value)}
-                  autoComplete="current-password"
-                />
+                Username
+                <input value={username} onChange={(event) => setUsername(event.target.value)} required />
               </label>
               <label>
-                New password
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(event) => setNewPassword(event.target.value)}
-                  autoComplete="new-password"
-                />
+                Email
+                <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
               </label>
-            </div>
-            <div className="actions">
-              <button type="submit" disabled={saving || !username || !email}>
-                {saving ? 'Saving...' : 'Save account'}
-              </button>
-            </div>
-          </form>
-        </Card>
-
-        <Card title="Danger zone">
-          <div className="stack">
-            {!confirmDelete ? (
-              <>
-                <p className="muted-copy">Delete this account and remove its local tasks, logs, and chat history.</p>
-                <button className="danger" type="button" onClick={() => setConfirmDelete(true)}>
-                  Delete account
+              {!changePassword ? (
+                <button className="secondary account-button" type="button" onClick={() => setChangePassword(true)}>
+                  Change password
                 </button>
-              </>
-            ) : (
-              <>
-                <div className="warning-panel">
-                  <strong>This cannot be undone.</strong>
-                  <p>Type <span>{expectedConfirmation}</span> to confirm account deletion.</p>
-                </div>
-                <label className="danger-confirm-label">
-                  Confirm username
-                  <input
-                    value={deleteConfirmation}
-                    onChange={(event) => setDeleteConfirmation(event.target.value)}
-                    disabled={deleting}
-                  />
-                </label>
-                <div className="actions">
-                  <button className="danger" type="button" disabled={!canDelete || deleting} onClick={handleDeleteAccount}>
-                    {deleting ? 'Deleting...' : 'Confirm delete'}
-                  </button>
+              ) : (
+                <div className="password-panel">
+                  <div className="form-row">
+                    <label>
+                      Current password
+                      <input
+                        type="password"
+                        value={currentPassword}
+                        onChange={(event) => setCurrentPassword(event.target.value)}
+                        autoComplete="off"
+                      />
+                    </label>
+                    <label>
+                      New password
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(event) => setNewPassword(event.target.value)}
+                        autoComplete="new-password"
+                      />
+                    </label>
+                  </div>
                   <button
-                    className="secondary"
+                    className="secondary account-button"
                     type="button"
-                    disabled={deleting}
                     onClick={() => {
-                      setConfirmDelete(false);
-                      setDeleteConfirmation('');
+                      setChangePassword(false);
+                      setCurrentPassword('');
+                      setNewPassword('');
                     }}
                   >
-                    Cancel
+                    Cancel password change
                   </button>
                 </div>
-              </>
-            )}
-          </div>
-        </Card>
+              )}
+              <div className="actions">
+                <button className="account-button" type="submit" disabled={saving || !username || !email}>
+                  {saving ? 'Saving...' : 'Save account'}
+                </button>
+              </div>
+            </form>
+          </Card>
+
+          <Card title="Danger zone">
+            <div className="stack">
+              {!confirmDelete ? (
+                <>
+                  <p className="muted-copy">Delete this account and remove its local tasks, logs, and chat history.</p>
+                  <button className="danger account-button" type="button" onClick={() => setConfirmDelete(true)}>
+                    Delete account
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="warning-panel">
+                    <strong>This cannot be undone.</strong>
+                    <p>Type <span>{expectedConfirmation}</span> to confirm account deletion.</p>
+                  </div>
+                  <label className="danger-confirm-label">
+                    Confirm username
+                    <input
+                      value={deleteConfirmation}
+                      onChange={(event) => setDeleteConfirmation(event.target.value)}
+                      disabled={deleting}
+                    />
+                  </label>
+                  <div className="actions">
+                    <button className="danger account-button" type="button" disabled={!canDelete || deleting} onClick={handleDeleteAccount}>
+                      {deleting ? 'Deleting...' : 'Confirm delete'}
+                    </button>
+                    <button
+                      className="secondary account-button"
+                      type="button"
+                      disabled={deleting}
+                      onClick={() => {
+                        setConfirmDelete(false);
+                        setDeleteConfirmation('');
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

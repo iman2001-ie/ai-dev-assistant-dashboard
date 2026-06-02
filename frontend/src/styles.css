@@ -507,6 +507,17 @@ pre {
   grid-template-columns: minmax(220px, 0.45fr) minmax(340px, 1fr);
 }
 
+.account-main,
+.password-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.account-button {
+  min-width: 180px;
+  width: fit-content;
+}
+
 .account-summary {
   align-items: center;
   background: #ffffff;
@@ -576,5 +587,9 @@ pre {
   .toolbar,
   .sidebar nav {
     grid-template-columns: 1fr;
+  }
+
+  .account-button {
+    width: 100%;
   }
 }
