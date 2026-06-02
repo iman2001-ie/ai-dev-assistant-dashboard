@@ -43,7 +43,13 @@ export default function LoginPage() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Login</h1>
+        <div style={styles.header}>
+          <p style={styles.productName}>AI Dev Assistant</p>
+          <h1 style={styles.title}>Welcome back</h1>
+          <p style={styles.description}>
+            Manage coding tasks, error logs, and assistant history in one developer workspace.
+          </p>
+        </div>
 
         {localError && <div style={styles.error}>{localError}</div>}
 
@@ -108,13 +114,29 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     width: '100%',
-    maxWidth: '400px',
+    maxWidth: '430px',
+  },
+  header: {
+    textAlign: 'center',
+    marginBottom: '1.75rem',
+  },
+  productName: {
+    margin: 0,
+    color: '#12315f',
+    fontSize: '1rem',
+    fontWeight: 800,
   },
   title: {
-    marginTop: 0,
-    marginBottom: '1.5rem',
+    marginTop: '0.35rem',
+    marginBottom: '0.5rem',
     textAlign: 'center',
     color: '#333',
+  },
+  description: {
+    margin: 0,
+    color: '#5d6b82',
+    fontSize: '0.95rem',
+    lineHeight: 1.5,
   },
   form: {
     display: 'flex',
