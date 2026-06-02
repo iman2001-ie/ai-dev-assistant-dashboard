@@ -86,6 +86,15 @@ export async function updateProfile(payload: ProfileUpdatePayload) {
   return json as UserProfile & { token: string; refreshToken: string };
 }
 
+export async function deleteAccount() {
+  const res = await fetchWithAuth(`${API_BASE_URL}/auth/me`, { method: 'DELETE' });
+  if (!res.ok) {
+    const json = await res.json().catch(() => null);
+    throw json || { message: 'Could not delete account' };
+  }
+  clearTokens();
+}
+
 export async function logout() {
   const token = getToken();
   try {

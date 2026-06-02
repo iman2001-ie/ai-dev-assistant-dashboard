@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
+function errorMessage(err: unknown, fallback: string) {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === 'object' && 'message' in err) {
+    return String((err as { message?: unknown }).message);
+  }
+  return fallback;
+}
+
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -22,8 +30,7 @@ export default function LoginPage() {
       await login(username, password);
       navigate('/tasks');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Login failed';
-      setLocalError(message);
+      setLocalError(errorMessage(err, 'Login failed'));
     }
   };
 
@@ -63,6 +70,12 @@ export default function LoginPage() {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        <p style={styles.helperLink}>
+          <Link to="/forgot-password" style={styles.link}>
+            Forgot password?
+          </Link>
+        </p>
 
         <p style={styles.footer}>
           Don't have an account?{' '}
@@ -142,6 +155,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     textAlign: 'center',
     marginTop: '1.5rem',
     color: '#666',
+    fontSize: '0.95rem',
+  },
+  helperLink: {
+    textAlign: 'center',
+    marginTop: '1rem',
+    marginBottom: 0,
     fontSize: '0.95rem',
   },
   link: {

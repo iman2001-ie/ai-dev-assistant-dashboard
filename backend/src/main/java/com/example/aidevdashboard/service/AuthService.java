@@ -5,9 +5,13 @@ import com.example.aidevdashboard.dto.AuthResponse;
 import com.example.aidevdashboard.dto.ProfileUpdateRequest;
 import com.example.aidevdashboard.dto.UserProfileResponse;
 import com.example.aidevdashboard.model.User;
+import com.example.aidevdashboard.repository.ChatMessageRepository;
+import com.example.aidevdashboard.repository.ErrorLogRepository;
+import com.example.aidevdashboard.repository.TaskRepository;
 import com.example.aidevdashboard.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -16,17 +20,26 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final CurrentUserService currentUserService;
+    private final TaskRepository taskRepository;
+    private final ErrorLogRepository errorLogRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     public AuthService(
             UserRepository userRepository,
             BCryptPasswordEncoder passwordEncoder,
             JwtUtil jwtUtil,
-            CurrentUserService currentUserService
+            CurrentUserService currentUserService,
+            TaskRepository taskRepository,
+            ErrorLogRepository errorLogRepository,
+            ChatMessageRepository chatMessageRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.currentUserService = currentUserService;
+        this.taskRepository = taskRepository;
+        this.errorLogRepository = errorLogRepository;
+        this.chatMessageRepository = chatMessageRepository;
     }
 
     public AuthResponse register(AuthRequest req) {
@@ -49,8 +62,11 @@ public class AuthService {
     }
 
     public AuthResponse login(AuthRequest req) {
-        User u = userRepository.findByUsername(req.getUsername()).orElseThrow(() -> new AuthException("Invalid credentials"));
-        if (!passwordEncoder.matches(req.getPassword(), u.getPasswordHash())) throw new AuthException("Invalid credentials");
+        User u = userRepository.findByUsername(req.getUsername())
+                .orElseThrow(() -> new AuthException("The account does not exist"));
+        if (!passwordEncoder.matches(req.getPassword(), u.getPasswordHash())) {
+            throw new AuthException("Wrong password");
+        }
         // rotate/issue refresh token
         String refresh = java.util.UUID.randomUUID().toString();
         u.setRefreshToken(refresh);
@@ -129,6 +145,18 @@ public class AuthService {
 
         String jwt = jwtUtil.generateToken(user.getUsername());
         return new AuthResponse(jwt, user.getUsername(), refresh, user.getEmail());
+    }
+
+    @Transactional
+    public void deleteCurrentAccount() {
+        User user = currentUserService.currentUser()
+                .orElseThrow(() -> new AuthException("Login is required"));
+
+        Long userId = user.getId();
+        chatMessageRepository.deleteByUserId(userId);
+        taskRepository.deleteByUserId(userId);
+        errorLogRepository.deleteByUserId(userId);
+        userRepository.delete(user);
     }
 
     private String normalize(String value) {

@@ -91,7 +91,21 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    void loginInvalidCredentials_returnsClearClientErrorWithoutTokens() {
+    void loginMissingAccount_returnsClearClientErrorWithoutTokens() {
+        ResponseEntity<Map> missingLogin = restTemplate.postForEntity("/api/auth/login", Map.of(
+                "username", "missingloginuser",
+                "password", "Password123!"
+        ), Map.class);
+
+        assertThat(missingLogin.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(missingLogin.getBody()).isNotNull();
+        assertThat(missingLogin.getBody().get("message")).isEqualTo("The account does not exist");
+        assertThat(missingLogin.getBody()).doesNotContainKey("token");
+        assertThat(missingLogin.getBody()).doesNotContainKey("refreshToken");
+    }
+
+    @Test
+    void loginWrongPassword_returnsClearClientErrorWithoutTokens() {
         Map<String, String> req = Map.of(
                 "username", "invalidloginuser",
                 "email", "invalidlogin@example.com",
@@ -107,7 +121,7 @@ public class AuthControllerIntegrationTest {
 
         assertThat(invalidLogin.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(invalidLogin.getBody()).isNotNull();
-        assertThat(invalidLogin.getBody().get("message")).isEqualTo("Invalid credentials");
+        assertThat(invalidLogin.getBody().get("message")).isEqualTo("Wrong password");
         assertThat(invalidLogin.getBody()).doesNotContainKey("token");
         assertThat(invalidLogin.getBody()).doesNotContainKey("refreshToken");
     }
@@ -236,6 +250,30 @@ public class AuthControllerIntegrationTest {
         ), headers), Map.class);
         assertThat(duplicateEmail.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(duplicateEmail.getBody().get("message")).isEqualTo("Email already exists");
+    }
+
+    @Test
+    void accountCanBeDeleted() {
+        Map<String, String> req = Map.of(
+                "username", "deleteaccountuser",
+                "email", "deleteaccount@example.com",
+                "password", "Password123!"
+        );
+        ResponseEntity<Map> register = restTemplate.postForEntity("/api/auth/register", req, Map.class);
+        assertThat(register.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth((String) register.getBody().get("token"));
+
+        ResponseEntity<Void> deleted = restTemplate.exchange("/api/auth/me", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+        assertThat(deleted.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<Map> login = restTemplate.postForEntity("/api/auth/login", Map.of(
+                "username", "deleteaccountuser",
+                "password", "Password123!"
+        ), Map.class);
+        assertThat(login.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(login.getBody().get("message")).isEqualTo("The account does not exist");
     }
 
     @Test

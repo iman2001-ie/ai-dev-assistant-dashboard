@@ -471,6 +471,35 @@ pre {
   padding: 0.85rem 1rem;
 }
 
+.muted-copy {
+  color: #64748b;
+  margin: 0;
+}
+
+.warning-panel {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  color: #9a3412;
+  padding: 0.85rem 1rem;
+}
+
+.warning-panel p {
+  margin: 0.35rem 0 0;
+}
+
+.warning-panel span {
+  color: #7c2d12;
+  font-weight: 800;
+}
+
+.danger-confirm-label {
+  color: #334155;
+  display: grid;
+  font-weight: 700;
+  gap: 0.35rem;
+}
+
 .account-grid {
   align-items: start;
   display: grid;

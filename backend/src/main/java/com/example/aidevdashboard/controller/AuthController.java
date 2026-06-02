@@ -47,6 +47,12 @@ public class AuthController {
         return ResponseEntity.ok(authService.updateProfile(req));
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteAccount() {
+        authService.deleteCurrentAccount();
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(org.springframework.security.core.Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {

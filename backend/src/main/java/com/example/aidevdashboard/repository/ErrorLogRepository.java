@@ -27,4 +27,6 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
     @Modifying
     @Query("UPDATE ErrorLog log SET log.userId = :userId WHERE log.userId IS NULL")
     int assignUnownedToUser(Long userId);
+
+    void deleteByUserId(Long userId);
 }

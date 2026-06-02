@@ -20,4 +20,6 @@ public interface TaskRepository extends JpaRepository<DeveloperTask, Long> {
     @Modifying
     @Query("UPDATE DeveloperTask task SET task.userId = :userId WHERE task.userId IS NULL")
     int assignUnownedToUser(Long userId);
+
+    void deleteByUserId(Long userId);
 }

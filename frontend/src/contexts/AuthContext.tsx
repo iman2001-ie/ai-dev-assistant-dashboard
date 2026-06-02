@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   updateProfile: (payload: authService.ProfileUpdatePayload) => Promise<authService.UserProfile>;
+  deleteAccount: () => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -63,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCurrentUser(result.username);
       setIsAuthenticated(true);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Login failed';
+      const message = getErrorMessage(err, 'Login failed');
       setError(message);
       throw err;
     } finally {
@@ -79,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCurrentUser(result.username);
       setIsAuthenticated(true);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Register failed';
+      const message = getErrorMessage(err, 'Register failed');
       setError(message);
       throw err;
     } finally {
@@ -95,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(true);
       return result;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Profile update failed';
+      const message = getErrorMessage(err, 'Profile update failed');
       setError(message);
       throw err;
     }
@@ -113,6 +114,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setError(null);
+    try {
+      await authService.deleteAccount();
+      setCurrentUser(null);
+      setIsAuthenticated(false);
+    } catch (err: unknown) {
+      const message = getErrorMessage(err, 'Account deletion failed');
+      setError(message);
+      throw err;
+    }
+  };
+
   const clearError = () => setError(null);
 
   return (
@@ -125,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login: handleLogin,
         register: handleRegister,
         updateProfile: handleUpdateProfile,
+        deleteAccount: handleDeleteAccount,
         logout: handleLogout,
         clearError,
       }}
@@ -151,4 +166,12 @@ function decodeTokenUsername(token: string): string {
   } catch {
     return 'User';
   }
+}
+
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === 'object' && 'message' in err) {
+    return String((err as { message?: unknown }).message);
+  }
+  return fallback;
 }

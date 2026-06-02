@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import { useAuth } from '../contexts/AuthContext';
 import { getProfile, type UserProfile } from '../services/auth';
@@ -12,13 +13,17 @@ function errorMessage(err: unknown, fallback: string) {
 }
 
 export default function AccountPage() {
-  const { currentUser, updateProfile } = useAuth();
+  const { currentUser, updateProfile, deleteAccount } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -57,6 +62,23 @@ export default function AccountPage() {
       setSaving(false);
     }
   }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await deleteAccount();
+      navigate('/login');
+    } catch (err: unknown) {
+      setError(errorMessage(err, 'Could not delete account'));
+      setDeleting(false);
+    }
+  }
+
+  const expectedConfirmation = profile?.username ?? currentUser ?? '';
+  const canDelete = deleteConfirmation === expectedConfirmation;
 
   return (
     <div className="stack">
@@ -115,6 +137,50 @@ export default function AccountPage() {
               </button>
             </div>
           </form>
+        </Card>
+
+        <Card title="Danger zone">
+          <div className="stack">
+            {!confirmDelete ? (
+              <>
+                <p className="muted-copy">Delete this account and remove its local tasks, logs, and chat history.</p>
+                <button className="danger" type="button" onClick={() => setConfirmDelete(true)}>
+                  Delete account
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="warning-panel">
+                  <strong>This cannot be undone.</strong>
+                  <p>Type <span>{expectedConfirmation}</span> to confirm account deletion.</p>
+                </div>
+                <label className="danger-confirm-label">
+                  Confirm username
+                  <input
+                    value={deleteConfirmation}
+                    onChange={(event) => setDeleteConfirmation(event.target.value)}
+                    disabled={deleting}
+                  />
+                </label>
+                <div className="actions">
+                  <button className="danger" type="button" disabled={!canDelete || deleting} onClick={handleDeleteAccount}>
+                    {deleting ? 'Deleting...' : 'Confirm delete'}
+                  </button>
+                  <button
+                    className="secondary"
+                    type="button"
+                    disabled={deleting}
+                    onClick={() => {
+                      setConfirmDelete(false);
+                      setDeleteConfirmation('');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </Card>
       </div>
     </div>
