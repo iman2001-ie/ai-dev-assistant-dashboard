@@ -9,8 +9,12 @@ const apiUrl = process.env.API_URL ?? "http://localhost:8080/api";
 const username = process.env.DEMO_USERNAME ?? "testuser";
 const password = process.env.DEMO_PASSWORD ?? "Password123!";
 const debugPort = Number(process.env.DEMO_DEBUG_PORT ?? 9700 + Math.floor(Math.random() * 200));
+const demoSpeed = Number(process.env.DEMO_SPEED ?? 1);
 const captureWidth = Number(process.env.DEMO_WIDTH ?? 1440);
 const captureHeight = Number(process.env.DEMO_HEIGHT ?? 900);
+const userDataDir = process.env.DEMO_BROWSER_PROFILE
+  ? path.resolve(process.env.DEMO_BROWSER_PROFILE)
+  : path.join(root, ".runtime", "readme-demo-browser-profile");
 const outputDir = path.join(root, "docs", "demo");
 const mp4Path = path.join(outputDir, "walkthrough.mp4");
 const rawMp4Path = path.join(outputDir, "walkthrough-raw.mp4");
@@ -156,6 +160,20 @@ async function connectToPage() {
     socket.addEventListener("error", reject, { once: true });
   });
   return new CdpClient(socket);
+}
+
+async function resetAppStorage(client) {
+  await client.send("Runtime.evaluate", {
+    expression: `
+      (() => {
+        localStorage.clear();
+        sessionStorage.clear();
+      })()
+    `,
+    awaitPromise: true
+  });
+  await client.send("Page.reload", { ignoreCache: true });
+  await waitForText(client, "Welcome back");
 }
 
 async function waitForText(client, text, timeoutMs = 15000) {
@@ -431,7 +449,7 @@ function waitForExit(child) {
 }
 
 async function wait(ms) {
-  await new Promise((resolve) => setTimeout(resolve, ms));
+  await new Promise((resolve) => setTimeout(resolve, ms * demoSpeed));
 }
 
 await fs.mkdir(outputDir, { recursive: true });
@@ -439,7 +457,6 @@ const auth = await getAuth();
 await cleanupDemoData({ Authorization: `Bearer ${auth.token}` });
 
 const browserPath = await findBrowserExecutable();
-const userDataDir = path.join(root, ".runtime", `readme-demo-video-profile-${Date.now()}`);
 await fs.mkdir(userDataDir, { recursive: true });
 
 const browser = spawn(browserPath, [
@@ -460,6 +477,7 @@ try {
   client = await connectToPage();
   await client.send("Page.enable");
   await client.send("Runtime.enable");
+  await resetAppStorage(client);
   await waitForText(client, "Welcome back");
   await injectCursor(client);
   await wait(1000);

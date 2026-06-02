@@ -319,3 +319,19 @@ docs/demo/walkthrough.gif
 ```
 
 The script deletes old `Demo:` tasks and logs for `testuser` before recording so the walkthrough stays repeatable.
+
+By default, the script reuses this ignored browser profile:
+
+```text
+.runtime/readme-demo-browser-profile/
+```
+
+Reusing the profile prevents Edge or Chrome first-run popups from appearing in every recording. The script still clears the app's local/session storage before recording so the login flow starts cleanly.
+
+To slow the demo down, set `DEMO_SPEED` before running the script. For example, `1.35` makes the walkthrough about 35% slower:
+
+```powershell
+$env:DEMO_SPEED="1.35"
+node scripts\capture-readme-demo-video.mjs
+Remove-Item Env:\DEMO_SPEED
+```
