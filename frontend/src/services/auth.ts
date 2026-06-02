@@ -18,6 +18,13 @@ export function clearTokens() {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
+function toApiError(json: unknown, fallback: string) {
+  if (json && typeof json === 'object' && 'message' in json) {
+    return new Error(String((json as { message?: unknown }).message));
+  }
+  return new Error(fallback);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function postJson(path: string, body: any) {
   const res = await fetch(`${API_BASE_URL}${path}`, {
@@ -31,14 +38,14 @@ async function postJson(path: string, body: any) {
 
 export async function register(username: string, email: string, password: string) {
   const { res, json } = await postJson('/auth/register', { username, email, password });
-  if (!res.ok) throw json || { message: 'Register failed' };
+  if (!res.ok) throw toApiError(json, 'Register failed');
   setTokens(json.token, json.refreshToken);
   return json;
 }
 
 export async function login(username: string, password: string) {
   const { res, json } = await postJson('/auth/login', { username, password });
-  if (!res.ok) throw json || { message: 'Login failed' };
+  if (!res.ok) throw toApiError(json, 'Login failed');
   setTokens(json.token, json.refreshToken);
   return json;
 }
@@ -49,7 +56,7 @@ export async function refresh() {
   const { res, json } = await postJson('/auth/refresh', { refreshToken });
   if (!res.ok) {
     clearTokens();
-    throw json || { message: 'Refresh failed' };
+    throw toApiError(json, 'Refresh failed');
   }
   setTokens(json.token, json.refreshToken);
   return json;
@@ -70,7 +77,7 @@ export interface ProfileUpdatePayload {
 export async function getProfile() {
   const res = await fetchWithAuth(`${API_BASE_URL}/auth/me`);
   const json = await res.json().catch(() => null);
-  if (!res.ok) throw json || { message: 'Could not load profile' };
+  if (!res.ok) throw toApiError(json, 'Could not load profile');
   return json as UserProfile;
 }
 
@@ -81,7 +88,7 @@ export async function updateProfile(payload: ProfileUpdatePayload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => null);
-  if (!res.ok) throw json || { message: 'Could not update profile' };
+  if (!res.ok) throw toApiError(json, 'Could not update profile');
   setTokens(json.token, json.refreshToken);
   return json as UserProfile & { token: string; refreshToken: string };
 }
@@ -90,7 +97,7 @@ export async function deleteAccount() {
   const res = await fetchWithAuth(`${API_BASE_URL}/auth/me`, { method: 'DELETE' });
   if (!res.ok) {
     const json = await res.json().catch(() => null);
-    throw json || { message: 'Could not delete account' };
+    throw toApiError(json, 'Could not delete account');
   }
   clearTokens();
 }
