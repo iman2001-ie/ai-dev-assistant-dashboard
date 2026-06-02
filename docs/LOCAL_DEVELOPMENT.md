@@ -286,3 +286,13 @@ The following paths are local/generated and are ignored by Git:
 - `*.log`
 
 They can be deleted when you want a clean local workspace. Do not delete `.env.local` unless you intentionally want to remove private local configuration.
+
+## Refresh README Screenshots
+
+With the frontend and backend running, refresh the README screenshots with:
+
+```powershell
+node scripts\capture-readme-screenshots.mjs
+```
+
+The script logs in as `testuser` by default, captures the main app pages at a fixed desktop viewport, and writes images to `docs/screenshots/`. It uses the `React state update warning` error log as the AI Assistant context when available.

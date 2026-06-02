@@ -37,13 +37,17 @@ The app currently runs locally. The walkthrough below uses sample development da
 
 ## Screenshots
 
-| Dashboard | Tasks |
+| Login | Dashboard |
 | --- | --- |
-| ![Dashboard overview showing task, log, and assistant activity summary cards](docs/screenshots/dashboard.png) | ![Task management page with task creation and filtering](docs/screenshots/tasks.png) |
+| ![Login page for AI Dev Assistant](docs/screenshots/login.png) | ![Dashboard overview showing task, log, and assistant activity summary cards](docs/screenshots/dashboard.png) |
 
-| Error Logs | AI Assistant |
+| Tasks | Error Logs |
 | --- | --- |
-| ![Error log page for saving stack traces and tracking resolved logs](docs/screenshots/error-logs.png) | ![AI assistant chat page with mock debugging response](docs/screenshots/ai-assistant.png) |
+| ![Task management page with task creation and filtering](docs/screenshots/tasks.png) | ![Error log page for saving stack traces and tracking resolved logs](docs/screenshots/error-logs.png) |
+
+| AI Assistant | Account |
+| --- | --- |
+| ![AI assistant chat page showing React state update warning history](docs/screenshots/ai-assistant.png) | ![Account page for editing profile details and deleting an account](docs/screenshots/account.png) |
 
 ## Tech Stack
 

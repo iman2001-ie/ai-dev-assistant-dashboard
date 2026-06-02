@@ -35,8 +35,10 @@
 
 ### screenshots/
 
+- **[login.png](./screenshots/login.png)** - Login page screenshot
 - **[dashboard.png](./screenshots/dashboard.png)** - Dashboard overview screenshot
 - **[tasks.png](./screenshots/tasks.png)** - Task management screenshot
 - **[error-logs.png](./screenshots/error-logs.png)** - Error logs page screenshot
-- **[ai-assistant.png](./screenshots/ai-assistant.png)** - AI assistant chat screenshot
+- **[ai-assistant.png](./screenshots/ai-assistant.png)** - AI assistant chat screenshot with React state update warning context
+- **[account.png](./screenshots/account.png)** - Account management screenshot
 
