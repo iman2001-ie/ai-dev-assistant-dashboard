@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -26,13 +27,18 @@ export default function LoginPage() {
       return;
     }
 
+    setSubmitting(true);
     try {
       await login(username, password);
       navigate('/tasks');
     } catch (err: unknown) {
       setLocalError(errorMessage(err, 'Login failed'));
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  const disabled = loading || submitting;
 
   return (
     <div style={styles.container}>
@@ -48,7 +54,7 @@ export default function LoginPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              disabled={loading}
+              disabled={disabled}
               style={styles.input}
               placeholder="Enter your username"
             />
@@ -60,14 +66,14 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
+              disabled={disabled}
               style={styles.input}
               placeholder="Enter your password"
             />
           </div>
 
-          <button type="submit" disabled={loading} style={styles.button}>
-            {loading ? 'Logging in...' : 'Login'}
+          <button type="submit" disabled={disabled} style={styles.button}>
+            {submitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

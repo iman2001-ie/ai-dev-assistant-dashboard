@@ -57,7 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const handleLogin = async (username: string, password: string) => {
-    setLoading(true);
     setError(null);
     try {
       const result = await authService.login(username, password);
@@ -67,13 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const message = getErrorMessage(err, 'Login failed');
       setError(message);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleRegister = async (username: string, email: string, password: string) => {
-    setLoading(true);
     setError(null);
     try {
       const result = await authService.register(username, email, password);
@@ -83,8 +79,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const message = getErrorMessage(err, 'Register failed');
       setError(message);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 

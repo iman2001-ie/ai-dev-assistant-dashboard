@@ -8,6 +8,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const { register, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -41,6 +42,7 @@ export default function RegisterPage() {
       return;
     }
 
+    setSubmitting(true);
     try {
       await register(username, email, password);
       // After successful registration, redirect to tasks or login
@@ -48,8 +50,12 @@ export default function RegisterPage() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       setLocalError(message);
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  const disabled = loading || submitting;
 
   return (
     <div style={styles.container}>
@@ -65,7 +71,7 @@ export default function RegisterPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              disabled={loading}
+              disabled={disabled}
               style={styles.input}
               placeholder="Choose a username"
             />
@@ -77,7 +83,7 @@ export default function RegisterPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
+              disabled={disabled}
               style={styles.input}
               placeholder="Enter your email"
             />
@@ -89,7 +95,7 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
+              disabled={disabled}
               style={styles.input}
               placeholder="Create a password"
             />
@@ -101,14 +107,14 @@ export default function RegisterPage() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={loading}
+              disabled={disabled}
               style={styles.input}
               placeholder="Confirm your password"
             />
           </div>
 
-          <button type="submit" disabled={loading} style={styles.button}>
-            {loading ? 'Registering...' : 'Register'}
+          <button type="submit" disabled={disabled} style={styles.button}>
+            {submitting ? 'Registering...' : 'Register'}
           </button>
         </form>
 
