@@ -3,7 +3,7 @@ project_name: "AI Dev Assistant Dashboard"
 generated_by: "bmad-document-project"
 updated_by: "Codex wrap-up pass"
 date: 2026-05-27
-last_updated: 2026-06-02
+last_updated: 2026-06-03
 sections_completed: ["summary","tech_stack","quickstart","notes_for_agents","current_status"]
 ---
 
@@ -21,6 +21,7 @@ The local MVP is functional:
 
 - Users can register, log in, refresh tokens, log out, edit profile details, change passwords, and delete their account.
 - Tasks, error logs, and chat history are scoped per authenticated user.
+- Tasks are displayed by priority, and error logs are displayed with open logs before resolved logs.
 - Seeded sample data can be claimed by a local development user through `scripts\create-dev-user.ps1`.
 - The assistant supports general chat and error-log-specific chat history.
 - GitHub CI runs backend tests, frontend lint, and TypeScript checks.
@@ -53,6 +54,5 @@ The local MVP is functional:
 
 ## Next recommended docs
 
-- Refresh README screenshots and demo assets when the UI is ready for a new public walkthrough.
 - Add deployment notes when a production target is selected.
 

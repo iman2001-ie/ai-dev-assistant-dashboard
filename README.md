@@ -6,6 +6,10 @@ A full-stack developer productivity dashboard for tracking coding tasks, saving 
 
 This project is intentionally small enough to learn from, but structured like a real application: a React frontend, a Spring Boot REST API, PostgreSQL persistence, Flyway migrations, JWT authentication, local development scripts, and GitHub CI.
 
+The project was built through an agentic coding workflow: Codex helped inspect the codebase, implement focused changes, run checks, debug failures, and keep the repository documented as the app evolved.
+
+BMAD was used as the planning layer for the sprint. It helped convert early goals into epics, stories, sprint status, and review artifacts while the implementation work stayed grounded in local testing and GitHub commits.
+
 ## Current Status
 
 The app is a working local MVP. Users can register, log in, manage their account, create private tasks and error logs, and chat with the assistant in either a general context or attached to a saved error log.
@@ -21,8 +25,8 @@ The assistant works without an OpenAI API key by returning mock responses. If `O
 - Account deletion with confirmation
 - Per-user task, error-log, and chat-history isolation
 - Dashboard summary for tasks, unresolved logs, and assistant activity
-- Task management with status and priority filters
-- Error log storage with source and resolved/open filters
+- Task management with status and priority filters, priority-first ordering, and success feedback
+- Error log storage with source and resolved/open filters, open-first ordering, and success feedback
 - AI assistant chat with separate histories for general chat and each saved error log
 - Markdown rendering for assistant responses
 - Mock assistant responses when no OpenAI API key is configured
@@ -31,7 +35,7 @@ The assistant works without an OpenAI API key by returning mock responses. If `O
 
 ## Demo
 
-The app currently runs locally. The walkthrough below logs in as `testuser`, opens the dashboard, creates and edits a task, saves a new error log, asks the AI assistant about that log, previews account settings, and returns to the dashboard.
+The app currently runs locally. The walkthrough below logs in as `testuser`, opens the dashboard, creates a high-priority task, saves a new error log, asks the AI assistant about that log, previews account settings, and returns to the dashboard.
 
 The README uses the GIF for easy viewing on GitHub. A higher-quality MP4 version is also available at [`docs/demo/walkthrough.mp4`](docs/demo/walkthrough.mp4).
 
@@ -292,11 +296,10 @@ npx tsc -b
 
 - [Documentation index](docs/index.md)
 - [Local development notes](docs/LOCAL_DEVELOPMENT.md)
-- [Authentication decision](docs/auth-decision.md)
 - [Secrets and API keys](docs/SECRETS.md)
-- [Project overview](docs/project-overview.md)
-- [Sprint 1 task tracker](docs/sprint1-tasks.md)
 - [Agent instructions](AGENTS.md)
+
+Additional notes, sprint artifacts, and BMAD-generated planning documents are available under [`docs/`](docs/) and [`_bmad-output/`](_bmad-output/) for readers who want the project history.
 
 ## Roadmap
 

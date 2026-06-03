@@ -19,7 +19,7 @@ This file summarizes the Sprint 1 work that moved the app from a mostly broken l
 | sprint1-dashboard-frontend | Frontend: agent list UI and run controls | deferred | Original idea deferred pending clearer product direction. |
 | sprint1-dashboard-logs | Persist agent run logs and retrieve | deferred | Current persisted logs are user-created error logs, not agent run logs. |
 | sprint1-observability | Add structured logging and metrics endpoint | deferred | Useful later, not required for the current local MVP. |
-| sprint1-smoke-tests | Add smoke E2E tests for core flows | deferred | Recommended next quality step after screenshots/demo refresh. |
+| sprint1-smoke-tests | Add smoke E2E tests for core flows | deferred | Recommended next quality step before expanding the app. |
 
 ## Completed User-Facing Outcomes
 
@@ -47,7 +47,6 @@ Follow-on work was completed through direct implementation and review loops rath
 
 ## Deferred Work
 
-- Refresh screenshots and demo walkthrough.
 - Add E2E smoke tests for login, task creation, log creation/deletion, and account deletion.
 - Add task due dates and tags.
 - Improve assistant conversation organization.

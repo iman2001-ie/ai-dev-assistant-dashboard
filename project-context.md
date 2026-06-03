@@ -2,7 +2,7 @@
 project_name: "AI Dev Assistant Dashboard"
 user_name: "iman.entezari"
 date: 2026-05-27
-last_updated: 2026-06-02
+last_updated: 2026-06-03
 sections_completed: ["technology_stack","critical_rules","current_mvp_status"]
 existing_patterns_found: 6
 ---
@@ -22,6 +22,7 @@ _This file captures unobvious rules and patterns agents must follow when impleme
 
 - The app has username/password auth, JWT access tokens, server-side refresh tokens, protected frontend routes, and account management.
 - Tasks, error logs, and chat history are scoped per authenticated user by `user_id`.
+- Tasks are displayed by priority; error logs are displayed with open logs before resolved logs.
 - Local sample data can be claimed by a development user through `scripts\create-dev-user.ps1`.
 - The forgot-password route is a frontend placeholder only.
 - There is no role/admin/super-user model yet.
@@ -52,6 +53,6 @@ _This file captures unobvious rules and patterns agents must follow when impleme
 
 ## Next recommended actions
 
-- Index docs for LLM consumption: run `bmad-index-docs`.
-- Refresh demo screenshots/walkthrough once the public UI is ready for a new capture pass.
+- Add smoke E2E tests if this project resumes.
+- Add deployment notes if a production target is selected.
 
