@@ -305,11 +305,7 @@ Additional notes, sprint artifacts, and BMAD-generated planning documents are av
 
 - Add task due dates and tags
 - Improve assistant conversation grouping
-- Add streaming AI responses
-- Add smoke E2E tests for core authenticated flows
 - Add production Dockerfiles for frontend and backend
-- Add richer assistant tool traces
-- Revisit frontend token storage and production auth hardening
 
 ## License
 
