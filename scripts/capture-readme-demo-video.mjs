@@ -353,16 +353,9 @@ async function createTask(client) {
   await selectField(client, ".content-grid form .form-row label:nth-child(2) select", "HIGH");
   await moveCursor(client, 345, 535);
   await clickButtonByText(client, "Create task");
+  await waitForText(client, "New task created.");
   await waitForText(client, taskTitle);
-  await wait(1200);
-  await moveCursor(client, 755, 414);
-  await clickButtonByText(client, "Edit");
-  await waitForText(client, "Update task");
-  await wait(800);
-  await selectField(client, ".content-grid form select", "DONE");
-  await moveCursor(client, 358, 535);
-  await clickButtonByText(client, "Update task");
-  await wait(1200);
+  await wait(1800);
 }
 
 async function createLog(client) {
@@ -376,6 +369,7 @@ async function createLog(client) {
   await typeField(client, ".content-grid form textarea", logContent, 5, 85);
   await moveCursor(client, 350, 667);
   await clickButtonByText(client, "Save log");
+  await waitForText(client, "New log created.");
   await waitForText(client, logTitle);
   await wait(1500);
 }

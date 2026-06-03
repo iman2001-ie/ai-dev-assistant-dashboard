@@ -4,6 +4,7 @@ import Card from '../components/Card';
 import LogList from '../components/LogList';
 import TaskList from '../components/TaskList';
 import type { DashboardSummary } from '../types';
+import { sortLogsByStatusAndCreatedAt, sortTasksByPriority } from '../utils/sort';
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -45,10 +46,10 @@ export default function DashboardPage() {
 
       <div className="content-grid">
         <Card title="Recent tasks">
-          <TaskList tasks={summary?.recentTasks ?? []} />
+          <TaskList tasks={sortTasksByPriority(summary?.recentTasks ?? [])} />
         </Card>
         <Card title="Recent logs">
-          <LogList logs={summary?.recentLogs ?? []} />
+          <LogList logs={sortLogsByStatusAndCreatedAt(summary?.recentLogs ?? [])} />
         </Card>
       </div>
     </div>

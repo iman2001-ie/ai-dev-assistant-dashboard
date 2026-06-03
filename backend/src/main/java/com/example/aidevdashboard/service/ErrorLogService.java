@@ -6,6 +6,7 @@ import com.example.aidevdashboard.model.ErrorLog;
 import com.example.aidevdashboard.repository.ChatMessageRepository;
 import com.example.aidevdashboard.repository.ErrorLogRepository;
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,18 +30,18 @@ public class ErrorLogService {
     public List<LogResponse> findAll() {
         Long userId = currentUserService.currentUserId();
         if (userId != null) {
-            return errorLogRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream().map(LogResponse::fromEntity).toList();
+            return errorLogRepository.findAllByUserIdOrderByResolvedAscCreatedAtDesc(userId).stream().map(LogResponse::fromEntity).toList();
         }
-        return errorLogRepository.findAll().stream().map(LogResponse::fromEntity).toList();
+        return errorLogRepository.findAllByOrderByResolvedAscCreatedAtDesc().stream().map(LogResponse::fromEntity).toList();
     }
 
     @Transactional(readOnly = true)
     public List<LogResponse> findRecent() {
         Long userId = currentUserService.currentUserId();
         if (userId != null) {
-            return errorLogRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId).stream().map(LogResponse::fromEntity).toList();
+            return errorLogRepository.findByUserIdOrderByResolvedAscCreatedAtDesc(userId, PageRequest.of(0, 5)).stream().map(LogResponse::fromEntity).toList();
         }
-        return errorLogRepository.findTop5ByOrderByCreatedAtDesc().stream().map(LogResponse::fromEntity).toList();
+        return errorLogRepository.findByOrderByResolvedAscCreatedAtDesc(PageRequest.of(0, 5)).stream().map(LogResponse::fromEntity).toList();
     }
 
     @Transactional(readOnly = true)

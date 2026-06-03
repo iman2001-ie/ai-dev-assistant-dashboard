@@ -2,16 +2,61 @@ package com.example.aidevdashboard.repository;
 
 import com.example.aidevdashboard.model.DeveloperTask;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TaskRepository extends JpaRepository<DeveloperTask, Long> {
-    List<DeveloperTask> findTop5ByOrderByCreatedAtDesc();
+    @Query("""
+            SELECT task FROM DeveloperTask task
+            ORDER BY
+                CASE
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.HIGH THEN 0
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.MEDIUM THEN 1
+                    ELSE 2
+                END,
+                task.createdAt DESC
+            """)
+    List<DeveloperTask> findAllOrderedByPriority();
 
-    List<DeveloperTask> findAllByUserId(Long userId);
+    @Query("""
+            SELECT task FROM DeveloperTask task
+            WHERE task.userId = :userId
+            ORDER BY
+                CASE
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.HIGH THEN 0
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.MEDIUM THEN 1
+                    ELSE 2
+                END,
+                task.createdAt DESC
+            """)
+    List<DeveloperTask> findAllByUserIdOrderedByPriority(Long userId);
 
-    List<DeveloperTask> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
+    @Query("""
+            SELECT task FROM DeveloperTask task
+            ORDER BY
+                CASE
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.HIGH THEN 0
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.MEDIUM THEN 1
+                    ELSE 2
+                END,
+                task.createdAt DESC
+            """)
+    List<DeveloperTask> findRecentOrderedByPriority(Pageable pageable);
+
+    @Query("""
+            SELECT task FROM DeveloperTask task
+            WHERE task.userId = :userId
+            ORDER BY
+                CASE
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.HIGH THEN 0
+                    WHEN task.priority = com.example.aidevdashboard.model.TaskPriority.MEDIUM THEN 1
+                    ELSE 2
+                END,
+                task.createdAt DESC
+            """)
+    List<DeveloperTask> findRecentByUserIdOrderedByPriority(Long userId, Pageable pageable);
 
     java.util.Optional<DeveloperTask> findByIdAndUserId(Long id, Long userId);
 

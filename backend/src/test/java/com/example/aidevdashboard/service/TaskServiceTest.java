@@ -75,7 +75,7 @@ class TaskServiceTest {
         owned.setUserId(7L);
 
         when(currentUserService.currentUserId()).thenReturn(7L);
-        when(taskRepository.findAllByUserId(7L)).thenReturn(List.of(owned));
+        when(taskRepository.findAllByUserIdOrderedByPriority(7L)).thenReturn(List.of(owned));
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("testuser", "Password123!", List.of())
         );

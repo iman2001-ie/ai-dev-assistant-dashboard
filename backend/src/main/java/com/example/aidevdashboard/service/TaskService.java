@@ -5,6 +5,7 @@ import com.example.aidevdashboard.dto.TaskResponse;
 import com.example.aidevdashboard.model.DeveloperTask;
 import com.example.aidevdashboard.repository.TaskRepository;
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,18 +23,18 @@ public class TaskService {
     public List<TaskResponse> findAll() {
         Long userId = currentUserService.currentUserId();
         if (userId != null) {
-            return taskRepository.findAllByUserId(userId).stream().map(TaskResponse::fromEntity).toList();
+            return taskRepository.findAllByUserIdOrderedByPriority(userId).stream().map(TaskResponse::fromEntity).toList();
         }
-        return taskRepository.findAll().stream().map(TaskResponse::fromEntity).toList();
+        return taskRepository.findAllOrderedByPriority().stream().map(TaskResponse::fromEntity).toList();
     }
 
     @Transactional(readOnly = true)
     public List<TaskResponse> findRecent() {
         Long userId = currentUserService.currentUserId();
         if (userId != null) {
-            return taskRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId).stream().map(TaskResponse::fromEntity).toList();
+            return taskRepository.findRecentByUserIdOrderedByPriority(userId, PageRequest.of(0, 5)).stream().map(TaskResponse::fromEntity).toList();
         }
-        return taskRepository.findTop5ByOrderByCreatedAtDesc().stream().map(TaskResponse::fromEntity).toList();
+        return taskRepository.findRecentOrderedByPriority(PageRequest.of(0, 5)).stream().map(TaskResponse::fromEntity).toList();
     }
 
     @Transactional(readOnly = true)

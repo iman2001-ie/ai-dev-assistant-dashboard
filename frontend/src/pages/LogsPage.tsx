@@ -4,6 +4,7 @@ import Card from '../components/Card';
 import LogForm from '../components/LogForm';
 import LogList from '../components/LogList';
 import type { ErrorLog, LogPayload } from '../types';
+import { sortLogsByStatusAndCreatedAt } from '../utils/sort';
 
 export default function LogsPage() {
   const [logs, setLogs] = useState<ErrorLog[]>([]);
@@ -11,20 +12,36 @@ export default function LogsPage() {
   const [resolvedFilter, setResolvedFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
   const [sourceFilter, setSourceFilter] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageFading, setMessageFading] = useState(false);
 
   async function loadLogs() {
-    setLogs(await getLogs());
+    setLogs(sortLogsByStatusAndCreatedAt(await getLogs()));
   }
 
   useEffect(() => {
     loadLogs().catch((err: Error) => setError(err.message));
   }, []);
 
+  useEffect(() => {
+    if (!message) return;
+    setMessageFading(false);
+    const fadeTimeoutId = window.setTimeout(() => setMessageFading(true), 3200);
+    const clearTimeoutId = window.setTimeout(() => setMessage(''), 4300);
+    return () => {
+      window.clearTimeout(fadeTimeoutId);
+      window.clearTimeout(clearTimeoutId);
+    };
+  }, [message]);
+
   async function handleCreate(payload: LogPayload) {
     setError('');
+    setMessage('');
+    setMessageFading(false);
     try {
       await createLog(payload);
       await loadLogs();
+      setMessage('New log created.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save log');
       throw err;
@@ -36,10 +53,13 @@ export default function LogsPage() {
       return;
     }
     setError('');
+    setMessage('');
+    setMessageFading(false);
     try {
       await updateLog(editingLog.id, payload);
       setEditingLog(null);
       await loadLogs();
+      setMessage('Log updated.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update log');
       throw err;
@@ -48,6 +68,8 @@ export default function LogsPage() {
 
   async function handleDelete(id: number) {
     setError('');
+    setMessage('');
+    setMessageFading(false);
     try {
       await deleteLog(id);
       await loadLogs();
@@ -75,6 +97,7 @@ export default function LogsPage() {
         </div>
       </header>
       {error && <div className="error-banner">{error}</div>}
+      {message && <div className={`success-banner ${messageFading ? 'fade-out' : ''}`}>{message}</div>}
       <div className="content-grid">
         <Card title={editingLog ? 'Edit log' : 'New log'}>
           <LogForm

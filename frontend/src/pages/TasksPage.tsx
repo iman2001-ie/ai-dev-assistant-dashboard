@@ -4,6 +4,7 @@ import Card from '../components/Card';
 import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
 import type { DeveloperTask, TaskPayload } from '../types';
+import { sortTasksByPriority } from '../utils/sort';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<DeveloperTask[]>([]);
@@ -11,20 +12,36 @@ export default function TasksPage() {
   const [statusFilter, setStatusFilter] = useState<'ALL' | DeveloperTask['status']>('ALL');
   const [priorityFilter, setPriorityFilter] = useState<'ALL' | DeveloperTask['priority']>('ALL');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageFading, setMessageFading] = useState(false);
 
   async function loadTasks() {
-    setTasks(await getTasks());
+    setTasks(sortTasksByPriority(await getTasks()));
   }
 
   useEffect(() => {
     loadTasks().catch((err: Error) => setError(err.message));
   }, []);
 
+  useEffect(() => {
+    if (!message) return;
+    setMessageFading(false);
+    const fadeTimeoutId = window.setTimeout(() => setMessageFading(true), 3200);
+    const clearTimeoutId = window.setTimeout(() => setMessage(''), 4300);
+    return () => {
+      window.clearTimeout(fadeTimeoutId);
+      window.clearTimeout(clearTimeoutId);
+    };
+  }, [message]);
+
   async function handleCreate(payload: TaskPayload) {
     setError('');
+    setMessage('');
+    setMessageFading(false);
     try {
       await createTask(payload);
       await loadTasks();
+      setMessage('New task created.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create task');
       throw err;
@@ -36,10 +53,13 @@ export default function TasksPage() {
       return;
     }
     setError('');
+    setMessage('');
+    setMessageFading(false);
     try {
       await updateTask(editingTask.id, payload);
       setEditingTask(null);
       await loadTasks();
+      setMessage('Task updated.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update task');
       throw err;
@@ -48,6 +68,8 @@ export default function TasksPage() {
 
   async function handleDelete(id: number) {
     setError('');
+    setMessage('');
+    setMessageFading(false);
     try {
       await deleteTask(id);
       await loadTasks();
@@ -71,6 +93,7 @@ export default function TasksPage() {
         </div>
       </header>
       {error && <div className="error-banner">{error}</div>}
+      {message && <div className={`success-banner ${messageFading ? 'fade-out' : ''}`}>{message}</div>}
       <div className="content-grid">
         <Card title={editingTask ? 'Edit task' : 'New task'}>
           <TaskForm
