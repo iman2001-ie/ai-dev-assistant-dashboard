@@ -45,8 +45,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register(username, email, password);
-      // After successful registration, redirect to tasks or login
-      navigate('/tasks');
+      navigate('/');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       setLocalError(message);

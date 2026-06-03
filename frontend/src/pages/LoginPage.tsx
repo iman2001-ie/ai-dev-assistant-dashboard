@@ -30,7 +30,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(username, password);
-      navigate('/tasks');
+      navigate('/');
     } catch (err: unknown) {
       setLocalError(errorMessage(err, 'Login failed'));
     } finally {
@@ -106,15 +106,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: '100vh',
+    padding: '1rem',
     background: '#f5f5f5',
   },
   card: {
     background: 'white',
-    padding: '2rem',
+    padding: 'clamp(2rem, 4vw, 2.75rem)',
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    width: '100%',
-    maxWidth: '430px',
+    width: 'min(100%, 500px)',
   },
   header: {
     textAlign: 'center',
